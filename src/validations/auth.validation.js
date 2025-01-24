@@ -49,6 +49,12 @@ const verifyEmail = {
   }),
 };
 
+const me = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+  }),
+};
+
 module.exports = {
   register,
   login,
@@ -57,4 +63,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  me,
 };

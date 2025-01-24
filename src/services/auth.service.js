@@ -90,10 +90,22 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+/**
+ * Me
+ * @param {string} email
+ * @returns {Promise}{User}
+ */
+
+const me = async (email) => {
+  const user = await userService.getUserByEmail(email);
+  return user;
+};
+
 module.exports = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
   resetPassword,
   verifyEmail,
+  me,
 };
