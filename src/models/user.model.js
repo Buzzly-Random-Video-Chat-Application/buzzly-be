@@ -44,6 +44,16 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    avatar: {
+      type: String,
+      trim: true,
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error('Invalid URL');
+        }
+      },
+      default: 'https://res.cloudinary.com/dj8tkuzxz/image/upload/avatar_placeholder_ztylm3.png',
+    }
   },
   {
     timestamps: true,

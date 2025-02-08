@@ -10,6 +10,9 @@ components:
           format: email
         name:
           type: string
+        avatar:
+          type: string
+          format: uri
         role:
           type: string
           enum: [user, admin]
@@ -17,6 +20,7 @@ components:
         id: 5ebac534954b54139806c112
         email: fake@example.com
         name: fake name
+        avatar: https://example.com/avatar.png
         role: user
 
     Token:

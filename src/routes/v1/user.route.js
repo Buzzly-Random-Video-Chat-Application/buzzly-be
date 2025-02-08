@@ -198,19 +198,13 @@ module.exports = router;
  *             properties:
  *               name:
  *                 type: string
- *               email:
+ *               avatar:
  *                 type: string
- *                 format: email
- *                 description: must be unique
- *               password:
- *                 type: string
- *                 format: password
- *                 minLength: 8
- *                 description: At least one number and one letter
+ *                 format: uri
+ *                 description: Image URL
  *             example:
  *               name: fake name
- *               email: fake@example.com
- *               password: password1
+ *               avatar: https://example.com/avatar.png
  *     responses:
  *       "200":
  *         description: OK
