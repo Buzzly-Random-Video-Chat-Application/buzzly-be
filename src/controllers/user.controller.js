@@ -3,6 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
+const cloudinary = require('../config/cloudinary');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -25,7 +26,14 @@ const getUser = catchAsync(async (req, res) => {
 });
 
 const updateUser = catchAsync(async (req, res) => {
-  const user = await userService.updateUserById(req.params.userId, req.body);
+  const updateBody = { ...req.body };
+
+  if (req.file) {
+    const uploadedImage = await cloudinary.uploadImage(req.file.buffer);
+    updateBody.avatar = uploadedImage.secure_url;
+  }
+
+  const user = await userService.updateUserById(req.params.userId, updateBody);
   res.send(user);
 });
 

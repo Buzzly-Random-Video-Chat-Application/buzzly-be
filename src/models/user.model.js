@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
+const { genders } = require('../config/genders');
 
 const userSchema = mongoose.Schema(
   {
@@ -33,7 +34,7 @@ const userSchema = mongoose.Schema(
           throw new Error('Password must contain at least one letter and one number');
         }
       },
-      private: true, // used by the toJSON plugin
+      private: true,
     },
     role: {
       type: String,
@@ -52,8 +53,18 @@ const userSchema = mongoose.Schema(
           throw new Error('Invalid URL');
         }
       },
-      default: 'https://res.cloudinary.com/dj8tkuzxz/image/upload/avatar_placeholder_ztylm3.png',
-    }
+      default: 'https://res.cloudinary.com/dj8tkuzxz/image/upload/avatar_default_vzd9hu.png',
+    },
+    gender: {
+      type: String,
+      enum: genders,
+      default: 'other',
+    },
+    nationality: {
+      type: String,
+      trim: true,
+      default: 'Vietnam',
+    },
   },
   {
     timestamps: true,

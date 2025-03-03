@@ -3,6 +3,7 @@ const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const userValidation = require('../../validations/user.validation');
 const userController = require('../../controllers/user.controller');
+const upload = require('../../config/multer');
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router
 router
   .route('/:userId')
   .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
+  .patch(auth('manageUsers'), upload.single('avatar'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
 module.exports = router;
@@ -192,19 +193,27 @@ module.exports = router;
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               name:
  *                 type: string
  *               avatar:
+ *                 type: file
+ *                 format: binary
+ *                 description: Image file in binary format
+ *               gender:
  *                 type: string
- *                 format: uri
- *                 description: Image URL
+ *                 description: User gender
+ *               nationality:
+ *                 type: string
+ *                 description: User nationality
  *             example:
  *               name: fake name
- *               avatar: https://example.com/avatar.png
+ *               avatar: fake_avatar.png
+ *               gender: other
+ *               nationality: Vietnam
  *     responses:
  *       "200":
  *         description: OK

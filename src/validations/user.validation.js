@@ -33,7 +33,9 @@ const updateUser = {
   body: Joi.object()
     .keys({
       name: Joi.string(),
-      avatar: Joi.string(),
+      avatar: Joi.string().uri().optional(),
+      gender: Joi.string().valid('male', 'female', 'other'),
+      nationality: Joi.string(),
     })
     .min(1),
 };
