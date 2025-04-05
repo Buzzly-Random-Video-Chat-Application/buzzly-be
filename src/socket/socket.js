@@ -1,64 +1,59 @@
-const { handelStart, handelDisconnect, getType } = require('./lib');
+const { handelStart, getType, handelDisconnect } = require('./lib');
+const { incrementOnline, decrementOnline, getOnline } = require('../config/redis');
+const logger = require('../config/logger');
 
-/**
- * @param {import('socket.io').Server} io - The Socket.IO server instance.
- */
 const setupSocketIO = (io) => {
-  let online = 0;
-  const roomArr = [];
-
   io.on('connection', (socket) => {
-    // eslint-disable-next-line no-plusplus
-    online++;
-    io.emit('online', online); // Broadcast user count
+    incrementOnline()
+      .then(() => getOnline())
+      .then((count) => io.emit('online', count))
+      .catch((error) => logger.error('Error updating online count:', error));
 
-    // on start
-    socket.on('start', (cb) => {
-      handelStart(roomArr, socket, cb, io); // Call the pairing function
+    socket.on('start', ({ selectedGender, selectedCountry }, cb) => {
+      handelStart(selectedGender, selectedCountry, socket, cb, io);
     });
 
-    // On disconnectionemit("start",
     socket.on('disconnect', () => {
-      // eslint-disable-next-line no-plusplus
-      online--;
-      io.emit('online', online);
-      handelDisconnect(socket.id, roomArr, io); // Handle the disconnection
+      decrementOnline()
+        .then(() => getOnline())
+        .then((count) => io.emit('online', count))
+        .catch((error) => logger.error('Error updating online count:', error));
+      
+      handelDisconnect(socket.id, io);
+      logger.info(`Socket disconnected`);
     });
 
-    /// ------- logic for webrtc connection ------
-
-    // on ice send
-    socket.on('ice:send', ({ candidate, to }) => {
-      const type = getType(socket.id, roomArr); // Get the user's role (p1 or p2)
-      if (type) {
-        if (type.type === 'p1' && type.p2id === to) {
+    socket.on('ice:send', async ({ candidate, to }) => {
+      const type = await getType(socket.id);
+      if (type && ((type.type === 'p1' && type.p2id === to) || (type.type === 'p2' && type.p1id === to))) {
+        const toSocket = io.sockets.sockets.get(to);
+        if (toSocket && toSocket.connected) {
           io.to(to).emit('ice:reply', { candidate, from: socket.id });
-        } else if (type.type === 'p2' && type.p1id === to) {
-          io.to(to).emit('ice:reply', { candidate, from: socket.id });
+          setTimeout(() => {
+            if (!io.sockets.sockets.get(to)) {
+              socket.emit('error', 'Peer unavailable');
+            }
+          }, 5000);
+        } else {
+          socket.emit('error', 'Peer disconnected');
         }
       }
     });
 
-    // on sdp send
-    socket.on('sdp:send', ({ sdp, to }) => {
-      const type = getType(socket.id, roomArr);
-      if (type) {
-        if (type.type === 'p1' && type.p2id === to) {
+    socket.on('sdp:send', async ({ sdp, to }) => {
+      const type = await getType(socket.id);
+      if (type && ((type.type === 'p1' && type.p2id === to) || (type.type === 'p2' && type.p1id === to))) {
+        const toSocket = io.sockets.sockets.get(to);
+        if (toSocket && toSocket.connected) {
           io.to(to).emit('sdp:reply', { sdp, from: socket.id });
-        }
-        if (type.type === 'p2' && type.p1id === to) {
-          io.to(to).emit('sdp:reply', { sdp, from: socket.id });
+        } else {
+          socket.emit('error', 'Peer disconnected');
         }
       }
     });
 
-    /// --------- Messages -----------
-
-    // send message
     socket.on('send-message', (input, type, roomid) => {
-      //  Format message to show sender
-      const sender = type === 'p1' ? 'You: ' : 'Stranger: ';
-      socket.to(roomid).emit('get-message', input, sender); // Send to the room, not just the sender.
+      socket.to(roomid).emit('get-message', input, type);
     });
   });
 };

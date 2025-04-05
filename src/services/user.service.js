@@ -77,6 +77,16 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const updateIsShowReview = async (userId, isShowReview) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  user.isShowReview = isShowReview;
+  await user.save();
+  return user;
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -84,4 +94,5 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  updateIsShowReview,
 };

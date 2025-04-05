@@ -22,7 +22,7 @@ module.exports = router;
  * @swagger
  * tags:
  *   name: Auth
- *   description: Authentication
+ *   description:
  */
 
 /**

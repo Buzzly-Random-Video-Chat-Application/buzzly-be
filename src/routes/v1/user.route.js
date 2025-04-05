@@ -14,9 +14,13 @@ router
 
 router
   .route('/:userId')
-  .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth('manageUsers'), upload.single('avatar'), validate(userValidation.updateUser), userController.updateUser)
-  .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
+  .get(validate(userValidation.getUser), userController.getUser)
+  .patch(auth('updateUser'), upload.single('avatar'), validate(userValidation.updateUser), userController.updateUser)
+  .delete(auth('deleteUser'), validate(userValidation.deleteUser), userController.deleteUser);
+
+router
+  .route('/:userId/review')
+  .patch(auth('updateUser'), validate(userValidation.updateIsShowReview), userController.updateIsShowReview);
 
 module.exports = router;
 
@@ -60,8 +64,8 @@ module.exports = router;
  *                 minLength: 8
  *                 description: At least one number and one letter
  *               role:
- *                  type: string
- *                  enum: [user, admin]
+ *                 type: string
+ *                 enum: [user, admin]
  *             example:
  *               name: fake name
  *               email: fake@example.com
@@ -73,7 +77,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/User'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -89,37 +93,23 @@ module.exports = router;
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: name
- *         schema:
- *           type: string
- *         description: User name
- *       - in: query
- *         name: role
- *         schema:
- *           type: string
- *         description: User role
- *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
- *         description: sort by query in the form of field:desc/asc (ex. name:asc)
+ *         description: Sort by field (e.g., name:asc)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           minimum: 1
- *         default: 10
- *         description: Maximum number of users
+ *         description: Number of users per page
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number
+ *         description: Current page number
  *     responses:
  *       "200":
- *         description: OK
+ *         description: A list of users
  *         content:
  *           application/json:
  *             schema:
@@ -131,16 +121,12 @@ module.exports = router;
  *                     $ref: '#/components/schemas/User'
  *                 page:
  *                   type: integer
- *                   example: 1
  *                 limit:
  *                   type: integer
- *                   example: 10
  *                 totalPages:
  *                   type: integer
- *                   example: 1
  *                 totalResults:
  *                   type: integer
- *                   example: 1
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -149,47 +135,57 @@ module.exports = router;
 
 /**
  * @swagger
- * /users/{id}:
+ * /users/{userId}:
  *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
+ *     summary: Get user by ID
+ *     description: Only admins can retrieve user information.
  *     tags: [Users]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: User ID
  *     responses:
  *       "200":
- *         description: OK
+ *         description: User details
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/User'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 code: 404
+ *                 message: User not found
  *
  *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
+ *     summary: Update user
+ *     description: Only admins can update user information.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: User ID
  *     requestBody:
  *       required: true
  *       content:
@@ -200,56 +196,129 @@ module.exports = router;
  *               name:
  *                 type: string
  *               avatar:
- *                 type: file
+ *                 type: string
  *                 format: binary
- *                 description: Image file in binary format
  *               gender:
  *                 type: string
- *                 description: User gender
  *               nationality:
  *                 type: string
- *                 description: User nationality
  *             example:
- *               name: fake name
- *               avatar: fake_avatar.png
+ *               name: John Doe
+ *               avatar: file
  *               gender: other
  *               nationality: Vietnam
  *     responses:
  *       "200":
- *         description: OK
+ *         description: User updated successfully
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
- *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
+ *               $ref: '#/components/schemas/User'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 code: 404
+ *                 message: User not found
  *
  *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
+ *     summary: Delete user
+ *     description: Only admins can delete users.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: User ID
  *     responses:
- *       "200":
- *         description: No content
+ *       "204":
+ *         description: User deleted successfully
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 code: 404
+ *                 message: User not found
+ */
+
+/**
+ * @swagger
+ * /users/{userId}/review:
+ *   patch:
+ *     summary: Update user's review visibility
+ *     description: Only admins can update user's review visibility.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               isShowReview:
+ *                 type: boolean
+ *             example:
+ *               isShowReview: true
+ *     responses:
+ *       "200":
+ *         description: User's review visibility updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 code: 404
+ *                 message: User not found
  */

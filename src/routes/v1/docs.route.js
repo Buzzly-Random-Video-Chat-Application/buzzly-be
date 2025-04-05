@@ -15,6 +15,16 @@ router.get(
   '/',
   swaggerUi.setup(specs, {
     explorer: true,
+    swaggerOptions: {
+      url: '/v1/docs', // Định nghĩa URL gốc cho Swagger
+      defaultModelsExpandDepth: -1, // Tắt mở rộng model mặc định
+      docExpansion: 'none', // Thu gọn tài liệu mặc định
+      tryItOutEnabled: true, // Giữ khả năng thử API
+      requestInterceptor: (req) => {
+        console.log(`Swagger request: ${req.method} ${req.url}`); // Log request từ Swagger
+        return req;
+      },
+    },
   })
 );
 

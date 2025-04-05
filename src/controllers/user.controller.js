@@ -42,10 +42,17 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const updateIsShowReview = catchAsync(async (req, res) => {
+  const { isShowReview } = req.body;
+  const user = await userService.updateUserById(req.params.userId, { isShowReview });
+  res.send(user);
+});
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  updateIsShowReview,
 };

@@ -65,6 +65,10 @@ const userSchema = mongoose.Schema(
       trim: true,
       default: 'Vietnam',
     },
+    isShowReview: {
+      type: Boolean,
+      default: true,
+    }
   },
   {
     timestamps: true,

@@ -4,35 +4,30 @@ const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
 const setupSocketIO = require('./socket/socket');
-const redis = require('./config/redis');
+const { redis } = require('./config/redis');
 
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => {
   logger.info('Connected to MongoDB');
+  await redis.connect();
   server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`);
   });
   const io = new Server(server, {
+    path: '/v1/socket',
     cors: {
-      origin: '*',
+      origin: config.env === 'production' ? 'https://buzzly-example-domain.com' : 'http://localhost:5173',
       methods: ['GET', 'POST'],
     },
   });
-
-  try {
-    await redis.connect();
-  } catch (redisError) {
-    logger.info('Failed to connect to Redis:', redisError);
-    process.exit(1);
-  }
-  setupSocketIO(io, redis);
+  setupSocketIO(io);
 });
 
 const exitHandler = () => {
   if (server) {
     server.close(() => {
       logger.info('Server closed');
-      process.exit(1);
+      redis.quit().then(() => process.exit(1));
     });
   } else {
     process.exit(1);

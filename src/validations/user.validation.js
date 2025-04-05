@@ -46,10 +46,22 @@ const deleteUser = {
   }),
 };
 
+const updateIsShowReview = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object()
+    .keys({
+      isShowReview: Joi.boolean(),
+    })
+    .min(1),
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  updateIsShowReview,
 };
