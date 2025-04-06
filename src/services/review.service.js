@@ -21,7 +21,9 @@ const createReview = async (reviewBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryReviews = async (filter, options) => {
-  const reviews = await Review.paginate(filter, options);
+  const sortBy = options.sortBy || 'rating:desc';
+  const updatedOptions = { ...options, sortBy };
+  const reviews = await Review.paginate(filter, updatedOptions);
   return reviews;
 };
 

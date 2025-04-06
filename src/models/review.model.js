@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 
 const reviewSchema = mongoose.Schema(
@@ -21,6 +19,11 @@ const reviewSchema = mongoose.Schema(
             ref: 'User',
             required: true,
         },
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        }
     },
     {
         timestamps: true,

@@ -33,12 +33,17 @@ async function handelStart(selectedGender, selectedCountry, socket, cb, io) {
         if (existingRoomId) {
             try {
                 await removeFromWaitingList(selectedGender, selectedCountry, waitingUserId);
-                await saveRoom(existingRoomId, waitingUserId, socket.id);
+                // Lưu thêm userId vào room
+                await saveRoom(existingRoomId, waitingUserId, socket.id, {
+                    p1UserId: waitingSocket.handshake.query.userId,
+                    p2UserId: socket.handshake.query.userId,
+                });
 
                 socket.join(existingRoomId);
                 logger.info(`P1 (${waitingUserId}) paired with P2 (${socket.id}) in room ${existingRoomId}`);
-                io.to(waitingUserId).emit('remote-socket', socket.id);
-                socket.emit('remote-socket', waitingUserId);
+                // Gửi socket ID và userId của người kia
+                io.to(waitingUserId).emit('remote-socket', { socketId: socket.id, userId: socket.handshake.query.userId });
+                socket.emit('remote-socket', { socketId: waitingUserId, userId: waitingSocket.handshake.query.userId });
                 socket.emit('roomid', existingRoomId);
                 cb('p2');
             } catch (error) {
@@ -49,11 +54,15 @@ async function handelStart(selectedGender, selectedCountry, socket, cb, io) {
             const roomId = uuidv4();
             try {
                 await removeFromWaitingList(selectedGender, selectedCountry, waitingUserId);
-                await saveRoom(roomId, waitingUserId, socket.id);
+                // Lưu thêm userId vào room
+                await saveRoom(roomId, waitingUserId, socket.id, {
+                    p1UserId: waitingSocket.handshake.query.userId,
+                    p2UserId: socket.handshake.query.userId,
+                });
 
                 socket.join(roomId);
-                io.to(waitingUserId).emit('remote-socket', socket.id); 
-                socket.emit('remote-socket', waitingUserId); 
+                io.to(waitingUserId).emit('remote-socket', { socketId: socket.id, userId: socket.handshake.query.userId });
+                socket.emit('remote-socket', { socketId: waitingUserId, userId: waitingSocket.handshake.query.userId });
                 socket.emit('roomid', roomId);
                 cb('p2');
             } catch (error) {
@@ -64,7 +73,10 @@ async function handelStart(selectedGender, selectedCountry, socket, cb, io) {
     } else {
         const roomId = uuidv4();
         try {
-            await saveRoom(roomId, socket.id, null);
+            // Lưu room với userId của P1
+            await saveRoom(roomId, socket.id, null, {
+                p1UserId: socket.handshake.query.userId,
+            });
             await addToWaitingList(selectedGender, selectedCountry, socket.id);
             socket.join(roomId);
             socket.emit('roomid', roomId);
@@ -95,7 +107,7 @@ async function handelDisconnect(disconnectedId, io) {
                 const p2Socket = io.sockets.sockets.get(room.p2);
                 if (p2Socket && p2Socket.connected) {
                     io.to(room.p2).emit('disconnected');
-                    await saveRoom(roomKey.split(':')[1], room.p2, null);
+                    await saveRoom(roomKey.split(':')[1], room.p2, null, { p1UserId: room.p2UserId, p2UserId: null });
                 } else {
                     await deleteRoom(roomKey.split(':')[1]);
                 }
@@ -107,7 +119,7 @@ async function handelDisconnect(disconnectedId, io) {
             const p1Socket = io.sockets.sockets.get(room.p1);
             if (p1Socket && p1Socket.connected) {
                 io.to(room.p1).emit('disconnected');
-                await saveRoom(roomKey.split(':')[1], room.p1, null);
+                await saveRoom(roomKey.split(':')[1], room.p1, null, { p1UserId: room.p1UserId, p2UserId: null });
             } else {
                 await deleteRoom(roomKey.split(':')[1]);
             }
