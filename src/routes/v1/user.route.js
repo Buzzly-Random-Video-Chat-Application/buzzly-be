@@ -9,18 +9,22 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
-  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
+  .post(auth('manage'), validate(userValidation.createUser), userController.createUser)
+  .get(auth('get'), validate(userValidation.getUsers), userController.getUsers);
 
 router
   .route('/:userId')
   .get(validate(userValidation.getUser), userController.getUser)
-  .patch(auth('updateUser'), upload.single('avatar'), validate(userValidation.updateUser), userController.updateUser)
-  .delete(auth('deleteUser'), validate(userValidation.deleteUser), userController.deleteUser);
+  .patch(auth('update'), upload.single('avatar'), validate(userValidation.updateUser), userController.updateUser)
+  .delete(auth('delete'), validate(userValidation.deleteUser), userController.deleteUser);
+
+router
+  .route('/:userId/avatar')
+  .patch(auth('update'), upload.single('avatar'), validate(userValidation.updateUserAvatar), userController.updateUserAvatar);
 
 router
   .route('/:userId/review')
-  .patch(auth('updateUser'), validate(userValidation.updateIsShowReview), userController.updateIsShowReview);
+  .patch(auth('update'), validate(userValidation.updateIsShowReview), userController.updateIsShowReview);
 
 module.exports = router;
 
@@ -271,6 +275,63 @@ module.exports = router;
 
 /**
  * @swagger
+ * /users/{userId}/avatar:
+ *   patch:
+ *     summary: Update user avatar
+ *     description: Update only the user's avatar. Admins can update any user's avatar.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *             example:
+ *               avatar: file
+ *     responses:
+ *       "200":
+ *         description: Avatar updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       "400":
+ *         description: Bad request (e.g., no file uploaded)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 code: 400
+ *                 message: Avatar file is required
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
+
+/**
+ * @swagger
  * /users/{userId}/review:
  *   patch:
  *     summary: Update user's review visibility
@@ -321,4 +382,45 @@ module.exports = router;
  *               example:
  *                 code: 404
  *                 message: User not found
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         email:
+ *           type: string
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
+ *         isEmailVerified:
+ *           type: boolean
+ *         avatar:
+ *           type: string
+ *         gender:
+ *           type: string
+ *         nationality:
+ *           type: string
+ *         isShowReview:
+ *           type: boolean
+ *         isOnline:
+ *           type: boolean
+ *       example:
+ *         id: "507f1f77bcf86cd799439011"
+ *         name: "John Doe"
+ *         email: "john.doe@example.com"
+ *         role: "user"
+ *         isEmailVerified: false
+ *         avatar: "https://res.cloudinary.com/dj8tkuzxz/image/upload/avatar_default_vzd9hu.png"
+ *         gender: "other"
+ *         nationality: "Vietnam"
+ *         isShowReview: true
+ *         isOnline: false
  */

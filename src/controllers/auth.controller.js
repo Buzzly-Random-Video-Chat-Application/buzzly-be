@@ -11,12 +11,17 @@ const register = catchAsync(async (req, res) => {
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
+  await userService.updateUserById(user.id, { isOnline: true });
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
   await authService.logout(req.body.refreshToken);
+  const refreshTokenDoc = await Token.findOne({ token: req.body.refreshToken, type: tokenTypes.REFRESH });
+  if (refreshTokenDoc) {
+    await userService.updateUserById(refreshTokenDoc.user, { isOnline: false });
+  }
   res.status(httpStatus.NO_CONTENT).send();
 });
 

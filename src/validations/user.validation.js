@@ -57,6 +57,12 @@ const updateIsShowReview = {
     .min(1),
 };
 
+const updateUserAvatar = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -64,4 +70,5 @@ module.exports = {
   updateUser,
   deleteUser,
   updateIsShowReview,
+  updateUserAvatar,
 };

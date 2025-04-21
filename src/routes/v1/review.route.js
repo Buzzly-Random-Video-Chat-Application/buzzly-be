@@ -8,13 +8,13 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth('createReview'), validate(reviewValidation.createReview), reviewController.createReview)
+  .post(auth('create'), validate(reviewValidation.createReview), reviewController.createReview)
   .get(validate(reviewValidation.queryReviews), reviewController.queryReviews);
 
 router
   .route('/:reviewId')
-  .patch(auth('updateReview'), validate(reviewValidation.updateReview), reviewController.updateReview)
-  .delete(auth('deleteReview'), validate(reviewValidation.deleteReview), reviewController.deleteReview);
+  .patch(auth('update'), validate(reviewValidation.updateReview), reviewController.updateReview)
+  .delete(auth('delete'), validate(reviewValidation.deleteReview), reviewController.deleteReview);
 
 router
   .route('/app-rating')

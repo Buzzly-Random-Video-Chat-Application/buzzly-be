@@ -29,8 +29,12 @@ const updateUser = catchAsync(async (req, res) => {
   const updateBody = { ...req.body };
 
   if (req.file) {
-    const uploadedImage = await cloudinary.uploadImage(req.file.buffer);
-    updateBody.avatar = uploadedImage.secure_url;
+    try {
+      const uploadedImage = await cloudinary.uploadImage(req.file.buffer);
+      updateBody.avatar = uploadedImage.secure_url;
+    } catch (error) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to upload avatar');
+    }
   }
 
   const user = await userService.updateUserById(req.params.userId, updateBody);
@@ -48,6 +52,20 @@ const updateIsShowReview = catchAsync(async (req, res) => {
   res.send(user);
 });
 
+const updateUserAvatar = catchAsync(async (req, res) => {
+  if (!req.file) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Avatar file is required');
+  }
+
+  try {
+    const uploadedImage = await cloudinary.uploadImage(req.file.buffer);
+    const user = await userService.updateUserById(req.params.userId, { avatar: uploadedImage.secure_url });
+    res.send(user);
+  } catch (error) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to upload avatar');
+  }
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -55,4 +73,5 @@ module.exports = {
   updateUser,
   deleteUser,
   updateIsShowReview,
+  updateUserAvatar,
 };

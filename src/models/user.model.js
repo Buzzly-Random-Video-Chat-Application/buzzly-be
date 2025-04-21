@@ -68,7 +68,11 @@ const userSchema = mongoose.Schema(
     isShowReview: {
       type: Boolean,
       default: true,
-    }
+    },
+    isOnline: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
