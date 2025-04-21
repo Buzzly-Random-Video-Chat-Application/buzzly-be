@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 
-dotenv.config({ path: path.join(__dirname, '../../.env.test') });
+dotenv.config({ path: path.join(__dirname, '../../.env.production') });
 
 const envVarsSchema = Joi.object()
   .keys({
@@ -43,11 +43,7 @@ module.exports = {
   port: envVars.PORT,
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
-    options: {
-      // useCreateIndex: true,
-      // useNewUrlParser: true,
-      // useUnifiedTopology: true,
-    },
+    options: {},
   },
   jwt: {
     secret: envVars.JWT_SECRET,

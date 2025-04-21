@@ -39,6 +39,10 @@ if (config.env === 'production') {
 
 app.use('/v1', routes);
 
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to Buzzly API! Access endpoints at /v1', documentation: '/v1/docs' });
+});
+
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
