@@ -4,16 +4,18 @@ const config = require('../config/config');
 const swaggerDef = {
   openapi: '3.0.0',
   info: {
-    title: 'Buzzly API documentation',
+    title: 'Buzzly API Documentation',
     version,
+    description: 'API documentation for Buzzly backend, supporting authentication, user management, and more.',
     license: {
       name: 'MIT',
-      url: 'https://github.com/hagopj13/node-express-boilerplate/blob/master/LICENSE',
+      url: 'https://opensource.org/licenses/MIT',
     },
   },
   servers: [
     {
-      url: `http://localhost:${config.port}/v1`,
+      url: process.env.NODE_ENV === 'production' ? 'https://buzzly-server.onrender.com/v1' : `http://localhost:${config.port}/v1`,
+      description: process.env.NODE_ENV === 'production' ? 'Production server (Render)' : 'Local development server',
     },
   ],
 };

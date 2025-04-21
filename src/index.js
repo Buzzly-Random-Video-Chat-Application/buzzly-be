@@ -16,7 +16,7 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => 
   const io = new Server(server, {
     path: '/v1/socket',
     cors: {
-      origin: config.env === 'production' ? 'https://buzzly-example-domain.com' : 'http://localhost:5173',
+      origin: config.env === 'production' ? 'https://buzzly-server.onrender.com' : 'http://localhost:5173',
       methods: ['GET', 'POST'],
     },
   });
