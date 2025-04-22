@@ -1,20 +1,21 @@
 version: '3'
-
 services:
   node-app:
     build: .
     image: node-app
     environment:
-      - MONGODB_URL=mongodb://mongodb:27017/node-boilerplate
+      - NODE_ENV=development
+      - MONGODB_URL=mongodb://mongodb:27017/buzzly
+      - PORT=3000
     ports:
       - '3000:3000'
     depends_on:
       - mongodb
     volumes:
-      - .:/usr/src/node-app
+      - .:/usr/src/app
     networks:
       - node-network
-
+    command: yarn dev
   mongodb:
     image: mongo:4.2.1-bionic
     ports:
@@ -23,10 +24,8 @@ services:
       - dbdata:/data/db
     networks:
       - node-network
-
 volumes:
   dbdata:
-
 networks:
   node-network:
     driver: bridge
