@@ -1,0 +1,43 @@
+const MESSAGES = {
+  AUTH: {
+    REGISTER_SUCCESS: 'User registered successfully',
+    LOGIN_SUCCESS: 'Login successful',
+    LOGOUT_SUCCESS: 'Logout successful',
+    REFRESH_TOKENS_SUCCESS: 'Tokens refreshed successfully',
+    FORGOT_PASSWORD_SUCCESS: 'Password reset email sent successfully',
+    RESET_PASSWORD_SUCCESS: 'Password reset successfully',
+    RESET_PASSWORD_FAILED: 'Failed to reset password',
+    SEND_VERIFICATION_EMAIL_SUCCESS: 'Verification email sent successfully',
+    VERIFY_EMAIL_SUCCESS: 'Email verified successfully',
+    VERIFY_EMAIL_FAILED: 'Email verification failed',
+    GET_USER_INFO_SUCCESS: 'User information retrieved successfully',
+    GET_USER_INFO_FAILED: 'Failed to retrieve user information',
+    INVALID_CREDENTIALS: 'Invalid email or password',
+    INVALID_REFRESH_TOKEN: 'Invalid refresh token',
+    INVALID_RESET_TOKEN: 'Invalid or expired reset token',
+    INVALID_VERIFICATION_TOKEN: 'Invalid or expired verification token',
+    EMAIL_ALREADY_TAKEN: 'Email already taken',
+    EMAIL_NOT_FOUND: 'Email not found',
+    REFRESH_TOKEN_NOT_FOUND: 'Refresh token not found',
+    UNAUTHORIZED: 'Unauthorized',
+  },
+  USER: {
+    CREATE_SUCCESS: 'User created successfully',
+    UPDATE_SUCCESS: 'User updated successfully',
+    DELETE_SUCCESS: 'User deleted successfully',
+    GET_USERS_SUCCESS: 'Users retrieved successfully',
+    GET_USER_SUCCESS: 'User retrieved successfully',
+    UPDATE_AVATAR_SUCCESS: 'Avatar updated successfully',
+    UPDATE_REVIEW_VISIBILITY_SUCCESS: 'Review visibility updated successfully',
+    USER_NOT_FOUND: 'User not found',
+    AVATAR_REQUIRED: 'Avatar file is required',
+    FAILED_UPLOAD_AVATAR: 'Failed to upload avatar',
+  },
+  GENERAL: {
+    SERVER_ERROR: 'Internal server error',
+    BAD_REQUEST: 'Bad request',
+    FORBIDDEN: 'Forbidden',
+  },
+};
+
+module.exports = MESSAGES;

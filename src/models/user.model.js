@@ -65,6 +65,33 @@ const userSchema = mongoose.Schema(
       trim: true,
       default: 'Vietnam',
     },
+    hashTags: {
+      type: [String],
+      default: ['Hello'],
+    },
+    aboutMe: {
+      type: String,
+      trim: true,
+      default: null,
+      validate(value) {
+        if (value && value.length > 250) {
+          throw new Error('About me must be less than 250 characters');
+        }
+      },
+    },
+    preferredLanguage: {
+      type: [String],
+      default: ['VN'],
+      validate(value) {
+        if (value.length > 5) {
+          throw new Error('Preferred language must be less than 5 languages');
+        }
+      },
+    },
+    location: {
+      type: String,
+      default: null,
+    },
     isShowReview: {
       type: Boolean,
       default: true,
@@ -72,7 +99,7 @@ const userSchema = mongoose.Schema(
     isOnline: {
       type: Boolean,
       default: false,
-    },
+    }
   },
   {
     timestamps: true,

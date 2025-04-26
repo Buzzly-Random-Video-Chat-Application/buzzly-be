@@ -32,10 +32,13 @@ const updateUser = {
   }),
   body: Joi.object()
     .keys({
-      name: Joi.string(),
-      avatar: Joi.string().uri().optional(),
-      gender: Joi.string().valid('male', 'female', 'other'),
-      nationality: Joi.string(),
+      name: Joi.string().optional(),
+      gender: Joi.string().valid('male', 'female', 'other').optional(),
+      nationality: Joi.string().optional(),
+      hashTags: Joi.array().items(Joi.string()).optional(),
+      aboutMe: Joi.string().max(250).allow('').allow(null).optional(),
+      preferredLanguage: Joi.array().items(Joi.string()).optional(),
+      location: Joi.string().allow('').allow(null).optional(),
     })
     .min(1),
 };

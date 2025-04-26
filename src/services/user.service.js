@@ -14,16 +14,17 @@ const queryUsers = async (filter, options) => {
   return users;
 };
 
-const getUserById = async (id) => {
-  return User.findById(id);
+const getUser = async (userId) => {
+  const user = await User.findById(userId);
+  return user;
 };
 
 const getUserByEmail = async (email) => {
   return User.findOne({ email });
 };
 
-const updateUserById = async (userId, updateBody) => {
-  const user = await getUserById(userId);
+const updateUser = async (userId, updateBody) => {
+  const user = await getUser(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
@@ -32,20 +33,20 @@ const updateUserById = async (userId, updateBody) => {
   return user;
 };
 
-const deleteUserById = async (userId) => {
-  const user = await getUserById(userId);
+const deleteUser = async (userId) => {
+  const user = await getUser(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  await user.remove();
+  await user.deleteOne();
   return user;
 };
 
 module.exports = {
   createUser,
   queryUsers,
-  getUserById,
+  getUser,
   getUserByEmail,
-  updateUserById,
-  deleteUserById,
+  updateUser,
+  deleteUser,
 };

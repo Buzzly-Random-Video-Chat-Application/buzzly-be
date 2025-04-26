@@ -15,7 +15,7 @@ router
 router
   .route('/:userId')
   .get(validate(userValidation.getUser), userController.getUser)
-  .patch(auth('update'), upload.single('avatar'), validate(userValidation.updateUser), userController.updateUser)
+  .patch(auth('update'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('delete'), validate(userValidation.deleteUser), userController.deleteUser);
 
 router
@@ -25,8 +25,6 @@ router
 router
   .route('/:userId/review')
   .patch(auth('update'), validate(userValidation.updateIsShowReview), userController.updateIsShowReview);
-
-module.exports = router;
 
 /**
  * @swagger
@@ -46,7 +44,7 @@ module.exports = router;
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
- *       content:
+ *       content: 
  *         application/json:
  *           schema:
  *             type: object
@@ -77,13 +75,30 @@ module.exports = router;
  *               role: user
  *     responses:
  *       "201":
- *         description: Created
+ *         description: User created successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User created successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
+ *         description: Email already taken
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Email already taken
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -113,24 +128,30 @@ module.exports = router;
  *         description: Current page number
  *     responses:
  *       "200":
- *         description: A list of users
+ *         description: Users retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 results:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/User'
- *                 page:
- *                   type: integer
- *                 limit:
- *                   type: integer
- *                 totalPages:
- *                   type: integer
- *                 totalResults:
- *                   type: integer
+ *                 message:
+ *                   type: string
+ *                   example: Users retrieved successfully
+ *                 result:
+ *                   type: object
+ *                   properties:
+ *                     results:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/User'
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     totalResults:
+ *                       type: integer
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -153,11 +174,17 @@ module.exports = router;
  *         description: User ID
  *     responses:
  *       "200":
- *         description: User details
+ *         description: User retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User retrieved successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -171,15 +198,14 @@ module.exports = router;
  *               properties:
  *                 code:
  *                   type: integer
+ *                   example: 404
  *                 message:
  *                   type: string
- *               example:
- *                 code: 404
- *                 message: User not found
+ *                   example: User not found
  *
  *   patch:
  *     summary: Update user
- *     description: Only admins can update user information.
+ *     description: Only admins can update user information. Use /users/{userId}/avatar to update avatar.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -193,31 +219,70 @@ module.exports = router;
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
  *               name:
  *                 type: string
- *               avatar:
- *                 type: string
- *                 format: binary
+ *                 description: User's full name
  *               gender:
  *                 type: string
+ *                 enum: [male, female, other]
+ *                 description: User's gender
  *               nationality:
  *                 type: string
+ *                 description: User's nationality
+ *               hashTags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: User's hashtags (e.g., "travel,food" or ["travel", "food"])
+ *               aboutMe:
+ *                 type: string
+ *                 description: User's bio (max 250 characters)
+ *               preferredLanguage:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: User's preferred languages, max 5 (e.g., "EN,VN" or ["EN", "VN"])
+ *               location:
+ *                 type: string
+ *                 description: User's location
  *             example:
- *               name: John Doe
- *               avatar: file
- *               gender: other
+ *               name: fake name
+ *               gender: male
  *               nationality: Vietnam
+ *               hashTags: ["Hello", "Buzzlier"]
+ *               aboutMe: Hello my name is fake name.
+ *               preferredLanguage: ["VN", "CN"]
+ *               location: Earth
  *     responses:
  *       "200":
  *         description: User updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User updated successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       "400":
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -231,11 +296,10 @@ module.exports = router;
  *               properties:
  *                 code:
  *                   type: integer
+ *                   example: 404
  *                 message:
  *                   type: string
- *               example:
- *                 code: 404
- *                 message: User not found
+ *                   example: User not found
  *
  *   delete:
  *     summary: Delete user
@@ -253,6 +317,14 @@ module.exports = router;
  *     responses:
  *       "204":
  *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User deleted successfully
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -266,11 +338,10 @@ module.exports = router;
  *               properties:
  *                 code:
  *                   type: integer
+ *                   example: 404
  *                 message:
  *                   type: string
- *               example:
- *                 code: 404
- *                 message: User not found
+ *                   example: User not found
  */
 
 /**
@@ -307,9 +378,15 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Avatar updated successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       "400":
- *         description: Bad request (e.g., no file uploaded)
+ *         description: Avatar file is required
  *         content:
  *           application/json:
  *             schema:
@@ -317,17 +394,27 @@ module.exports = router;
  *               properties:
  *                 code:
  *                   type: integer
+ *                   example: 400
  *                 message:
  *                   type: string
- *               example:
- *                 code: 400
- *                 message: Avatar file is required
+ *                   example: Avatar file is required
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: User not found
  */
 
 /**
@@ -359,11 +446,17 @@ module.exports = router;
  *               isShowReview: true
  *     responses:
  *       "200":
- *         description: User's review visibility updated successfully
+ *         description: Review visibility updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Review visibility updated successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -377,11 +470,10 @@ module.exports = router;
  *               properties:
  *                 code:
  *                   type: integer
+ *                   example: 404
  *                 message:
  *                   type: string
- *               example:
- *                 code: 404
- *                 message: User not found
+ *                   example: User not found
  */
 
 /**
@@ -408,6 +500,18 @@ module.exports = router;
  *           type: string
  *         nationality:
  *           type: string
+ *         hashTags:
+ *           type: array
+ *           items:
+ *             type: string
+ *         aboutMe:
+ *           type: string
+ *         preferredLanguage:
+ *           type: array
+ *           items:
+ *             type: string
+ *         location:
+ *           type: string
  *         isShowReview:
  *           type: boolean
  *         isOnline:
@@ -419,8 +523,13 @@ module.exports = router;
  *         role: "user"
  *         isEmailVerified: false
  *         avatar: "https://res.cloudinary.com/dj8tkuzxz/image/upload/avatar_default_vzd9hu.png"
- *         gender: "other"
+ *         gender: "male"
  *         nationality: "Vietnam"
+ *         hashTags: ["travel", "food"]
+ *         aboutMe: "Software engineer with a passion for coding"
+ *         preferredLanguage: ["EN", "VN"]
+ *         location: "Hanoi"
  *         isShowReview: true
  *         isOnline: false
  */
+module.exports = router;

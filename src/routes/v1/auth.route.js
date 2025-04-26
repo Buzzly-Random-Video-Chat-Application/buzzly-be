@@ -14,7 +14,7 @@ router.post('/forgot-password', validate(authValidation.forgotPassword), authCon
 router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
-router.get('/me', auth(), validate(authValidation.me), authController.me);
+router.get('/me', auth(), authController.me);
 
 module.exports = router;
 
@@ -22,7 +22,7 @@ module.exports = router;
  * @swagger
  * tags:
  *   name: Auth
- *   description:
+ *   description: Authentication and user session management
  */
 
 /**
@@ -59,18 +59,30 @@ module.exports = router;
  *               password: password1
  *     responses:
  *       "201":
- *         description: Created
+ *         description: User registered successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 user:
- *                   $ref: '#/components/schemas/User'
+ *                 message:
+ *                   type: string
+ *                   example: User registered successfully
  *                 tokens:
  *                   $ref: '#/components/schemas/AuthTokens'
  *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
+ *         description: Email already taken
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Email already taken
  */
 
 /**
@@ -100,12 +112,15 @@ module.exports = router;
  *               password: password1
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
  *                 user:
  *                   $ref: '#/components/schemas/User'
  *                 tokens:
@@ -115,10 +130,14 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               code: 401
- *               message: Invalid email or password
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Invalid email or password
  */
 
 /**
@@ -142,9 +161,28 @@ module.exports = router;
  *               refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
  *     responses:
  *       "204":
- *         description: No content
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logout successful
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: Refresh token not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: Refresh token not found
  */
 
 /**
@@ -168,13 +206,30 @@ module.exports = router;
  *               refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Tokens refreshed successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AuthTokens'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tokens refreshed successfully
+ *                 tokens:
+ *                   $ref: '#/components/schemas/AuthTokens'
  *       "401":
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Invalid refresh token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Invalid refresh token
  */
 
 /**
@@ -200,9 +255,28 @@ module.exports = router;
  *               email: fake@example.com
  *     responses:
  *       "204":
- *         description: No content
+ *         description: Password reset email sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password reset email sent successfully
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: Email not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: Email not found
  */
 
 /**
@@ -236,16 +310,28 @@ module.exports = router;
  *               password: password1
  *     responses:
  *       "204":
- *         description: No content
- *       "401":
- *         description: Password reset failed
+ *         description: Password reset successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               code: 401
- *               message: Password reset failed
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password reset successfully
+ *       "401":
+ *         description: Invalid or expired reset token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired reset token
  */
 
 /**
@@ -259,9 +345,28 @@ module.exports = router;
  *       - bearerAuth: []
  *     responses:
  *       "204":
- *         description: No content
+ *         description: Verification email sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Verification email sent successfully
  *       "401":
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
  */
 
 /**
@@ -279,34 +384,63 @@ module.exports = router;
  *         description: The verify email token
  *     responses:
  *       "204":
- *         description: No content
- *       "401":
- *         description: verify email failed
+ *         description: Email verified successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               code: 401
- *               message: verify email failed
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Email verified successfully
+ *       "401":
+ *         description: Invalid or expired verification token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired verification token
  */
 
 /**
  * @swagger
  * /auth/me:
- *  get:
- *      summary: User information
- *      description: Get the current user's information
- *      tags: [Auth]
- *      security:
- *          - bearerAuth: []
- *      responses:
- *          "200":
- *            description: OK
- *            content:
- *              application/json:
- *               schema:
- *                 $ref: '#/components/schemas/User'
- *          "401":
- *              $ref: '#/components/responses/Unauthorized'
+ *   get:
+ *     summary: Get current user information
+ *     description: Retrieve the current user's information using the JWT access token
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: User information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User information retrieved successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
  */
