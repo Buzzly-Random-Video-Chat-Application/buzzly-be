@@ -94,7 +94,7 @@ const me = catchAsync(async (req, res) => {
   const user = await authService.me(req.user._id);
   res.send({
     message: MESSAGES.AUTH.GET_USER_INFO_SUCCESS,
-    user,
+    result: user,
   });
 });
 

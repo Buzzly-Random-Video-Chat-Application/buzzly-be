@@ -38,6 +38,22 @@ const MESSAGES = {
     BAD_REQUEST: 'Bad request',
     FORBIDDEN: 'Forbidden',
   },
+  BLOG: {
+    CREATE_SUCCESS: 'Blog created successfully',
+    GET_BLOGS_SUCCESS: 'Blogs retrieved successfully',
+    GET_BLOG_SUCCESS: 'Blog retrieved successfully',
+    UPDATE_SUCCESS: 'Blog updated successfully',
+    DELETE_SUCCESS: 'Blog deleted successfully',
+    PIN_SUCCESS: 'Blog pinned successfully',
+  },
+  REVIEW: {
+    CREATE_SUCCESS: 'Review created successfully',
+    GET_REVIEWS_SUCCESS: 'Reviews retrieved successfully',
+    GET_REVIEW_SUCCESS: 'Review retrieved successfully',
+    UPDATE_SUCCESS: 'Review updated successfully',
+    DELETE_SUCCESS: 'Review deleted successfully',
+    APP_RATING_SUCCESS: 'App rating retrieved successfully',
+  }
 };
 
 module.exports = MESSAGES;

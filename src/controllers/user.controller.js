@@ -7,10 +7,10 @@ const cloudinary = require('../config/cloudinary');
 const MESSAGES = require('../constants/messages');
 
 const createUser = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
+  const result = await userService.createUser(req.body);
   res.status(httpStatus.CREATED).send({
     message: MESSAGES.USER.CREATE_SUCCESS,
-    user,
+    result,
   });
 });
 
@@ -35,7 +35,7 @@ const getUser = catchAsync(async (req, res) => {
   }
   res.send({
     message: MESSAGES.USER.GET_USER_SUCCESS,
-    user
+    result: user
   });
 });
 
@@ -44,7 +44,7 @@ const updateUser = catchAsync(async (req, res) => {
   const user = await userService.updateUser(req.params.userId, updateBody);
   res.send({
     message: MESSAGES.USER.UPDATE_SUCCESS,
-    user,
+    result: user,
   });
 });
 
@@ -60,7 +60,7 @@ const updateIsShowReview = catchAsync(async (req, res) => {
   const user = await userService.updateUser(req.params.userId, { isShowReview });
   res.send({
     message: MESSAGES.USER.UPDATE_REVIEW_VISIBILITY_SUCCESS,
-    user,
+    result: user,
   });
 });
 
@@ -74,7 +74,7 @@ const updateUserAvatar = catchAsync(async (req, res) => {
     const user = await userService.updateUser(req.params.userId, { avatar: uploadedImage.secure_url });
     res.send({
       message: MESSAGES.USER.UPDATE_AVATAR_SUCCESS,
-      user,
+      result: user,
     });
   } catch (error) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to upload avatar');
