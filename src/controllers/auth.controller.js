@@ -28,7 +28,7 @@ const login = catchAsync(async (req, res) => {
     const tokens = await tokenService.generateAuthTokens(user);
     res.send({
       message: MESSAGES.AUTH.LOGIN_SUCCESS,
-      user,
+      result: user,
       tokens,
     });
   } catch (error) {
