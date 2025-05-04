@@ -99,6 +99,10 @@ const userSchema = mongoose.Schema(
     isOnline: {
       type: Boolean,
       default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     }
   },
   {

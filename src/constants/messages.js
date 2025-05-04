@@ -1,6 +1,6 @@
 const MESSAGES = {
   AUTH: {
-    REGISTER_SUCCESS: 'User registered successfully',
+    REGISTER_SUCCESS: 'User registered. Please verify your email',
     LOGIN_SUCCESS: 'Login successful',
     LOGOUT_SUCCESS: 'Logout successful',
     REFRESH_TOKENS_SUCCESS: 'Tokens refreshed successfully',
@@ -20,6 +20,7 @@ const MESSAGES = {
     EMAIL_NOT_FOUND: 'Email not found',
     REFRESH_TOKEN_NOT_FOUND: 'Refresh token not found',
     UNAUTHORIZED: 'Unauthorized',
+    EMAIL_NOT_VERIFIED: 'Email not verified',
   },
   USER: {
     CREATE_SUCCESS: 'User created successfully',

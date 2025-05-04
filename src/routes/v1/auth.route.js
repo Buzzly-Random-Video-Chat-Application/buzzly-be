@@ -237,7 +237,7 @@ module.exports = router;
  * /auth/forgot-password:
  *   post:
  *     summary: Forgot password
- *     description: An email will be sent to reset password.
+ *     description: An email will be sent with a reset password token.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -254,7 +254,7 @@ module.exports = router;
  *             example:
  *               email: fake@example.com
  *     responses:
- *       "204":
+ *       "200":
  *         description: Password reset email sent successfully
  *         content:
  *           application/json:
@@ -264,6 +264,9 @@ module.exports = router;
  *                 message:
  *                   type: string
  *                   example: Password reset email sent successfully
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
  *       "404":
  *         description: Email not found
  *         content:
@@ -307,9 +310,9 @@ module.exports = router;
  *                 minLength: 8
  *                 description: At least one number and one letter
  *             example:
- *               password: password1
+ *               password: newpassword1
  *     responses:
- *       "204":
+ *       "200":
  *         description: Password reset successfully
  *         content:
  *           application/json:

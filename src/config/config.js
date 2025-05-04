@@ -29,6 +29,7 @@ const envVarsSchema = Joi.object()
     REDIS_PASSWORD: Joi.string().description('redis password'),
     REDIS_HOST: Joi.string().description('redis host'),
     REDIS_PORT: Joi.number().description('redis port'),
+    FRONTEND_URL: Joi.string().description('frontend url'),
   })
   .unknown();
 
@@ -56,6 +57,7 @@ module.exports = {
     smtp: {
       host: envVars.SMTP_HOST,
       port: envVars.SMTP_PORT,
+      security: envVars.SMTP_SECURITY,
       auth: {
         user: envVars.SMTP_USERNAME,
         pass: envVars.SMTP_PASSWORD,
@@ -73,4 +75,5 @@ module.exports = {
     port: envVars.REDIS_PORT,
     password: envVars.REDIS_PASSWORD,
   },
+  frontendUrl: envVars.FRONTEND_URL,
 };

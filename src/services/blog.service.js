@@ -26,8 +26,8 @@ const createBlog = async (blogBody) => {
 const getBlogs = async (filter, options) => {
   const defaultSort = options.sortBy || 'createdAt:desc';
   const updatedOptions = { ...options, sortBy: defaultSort, populate: 'author' };
-  const finalFilter = { ...filter, deleteAt: null }; // Exclude soft-deleted blogs
-  const blogs = await Blog.paginate(finalFilter, updatedOptions);
+  // const finalFilter = { ...filter, deleteAt: null }; // Exclude soft-deleted blogs
+  const blogs = await Blog.paginate(filter, updatedOptions);
   return blogs;
 };
 
@@ -88,14 +88,9 @@ const pinBlog = async (blogId) => {
   if (!blog || blog.deleteAt) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Blog not found');
   }
-  const currentPinnedBlog = await Blog.findOne({ isPinned: true });
-  if (currentPinnedBlog) {
-    currentPinnedBlog.isPinned = false;
-    await currentPinnedBlog.save();
-  }
-  blog.isPinned = true;
+  blog.isPinned = !blog.isPinned;
   await blog.save();
-  return blog.populate('author');
+  return blog;
 };
 
 module.exports = {

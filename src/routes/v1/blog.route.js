@@ -16,11 +16,11 @@ router
     validate(blogValidation.createBlog),
     blogController.createBlog
   )
-  .get(auth('manage'), validate(blogValidation.getBlogs), blogController.getBlogs);
+  .get(validate(blogValidation.getBlogs), blogController.getBlogs);
 
 router
   .route('/:blogId')
-  .get(auth('manage'), validate(blogValidation.getBlog), blogController.getBlog)
+  .get(validate(blogValidation.getBlog), blogController.getBlog)
   .put(
     auth('manage'),
     upload.single('image'),
@@ -167,8 +167,6 @@ module.exports = router;
  *     summary: Get all blogs
  *     description: Retrieve a paginated list of blogs.
  *     tags: [Blogs]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: label
@@ -241,8 +239,6 @@ module.exports = router;
  *     summary: Get blog by ID
  *     description: Retrieve a single blog by its ID.
  *     tags: [Blogs]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: blogId

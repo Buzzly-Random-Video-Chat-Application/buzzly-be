@@ -5,7 +5,8 @@ const MESSAGES = require('../constants/messages');
 const ApiError = require('../utils/ApiError');
 
 const register = catchAsync(async (req, res) => {
-  if (await userService.getUserByEmail(req.body.email)) {
+  const { email, name } = req.body;
+  if (await userService.getUserByEmail(email)) {
     res.status(httpStatus.BAD_REQUEST).send({
       code: httpStatus.BAD_REQUEST,
       message: MESSAGES.AUTH.EMAIL_ALREADY_TAKEN,
@@ -13,15 +14,27 @@ const register = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.BAD_REQUEST, MESSAGES.AUTH.EMAIL_ALREADY_TAKEN);
   }
   const user = await userService.createUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user);
+  const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+
+  await emailService.sendWelcomeEmail(email, name);
+  await emailService.sendVerificationEmail(email, verifyEmailToken, name);
+
   res.status(httpStatus.CREATED).send({
     message: MESSAGES.AUTH.REGISTER_SUCCESS,
-    tokens,
   });
 });
 
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
+
+  const user = await userService.getUserByEmail(email);
+  if (user && !user.isVerified) {
+    return res.status(httpStatus.FORBIDDEN).send({
+      code: httpStatus.FORBIDDEN,
+      message: MESSAGES.AUTH.EMAIL_NOT_VERIFIED,
+    });
+  }
+
   try {
     const user = await authService.loginUserWithEmailAndPassword(email, password);
     await userService.updateUser(user.id, { isOnline: true });
@@ -55,22 +68,31 @@ const logout = catchAsync(async (req, res) => {
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
-  res.send({ ...tokens,
+  res.send({
+    ...tokens,
     message: MESSAGES.AUTH.REFRESH_TOKENS_SUCCESS,
-   });
+  });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
-  await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.NO_CONTENT).send({
+  const { email } = req.body;
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, MESSAGES.AUTH.EMAIL_NOT_FOUND);
+  }
+  const resetPasswordToken = await tokenService.generateResetPasswordToken(email);
+  await emailService.sendResetPasswordEmail(email, resetPasswordToken);
+  res.status(httpStatus.OK).send({
     message: MESSAGES.AUTH.FORGOT_PASSWORD_SUCCESS,
+    token: resetPasswordToken,
   });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(req.query.token, req.body.password);
-  res.status(httpStatus.NO_CONTENT).send({
+  const { token } = req.query;
+  const { password } = req.body;
+  await authService.resetPassword(token, password);
+  res.status(httpStatus.OK).send({
     message: MESSAGES.AUTH.RESET_PASSWORD_SUCCESS,
   });
 });
