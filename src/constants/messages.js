@@ -54,7 +54,14 @@ const MESSAGES = {
     UPDATE_SUCCESS: 'Review updated successfully',
     DELETE_SUCCESS: 'Review deleted successfully',
     APP_RATING_SUCCESS: 'App rating retrieved successfully',
-  }
+  },
+  FEEDBACK: {
+    CREATE_SUCCESS: 'Feedback submitted successfully',
+    GET_FEEDBACK_SUCCESS: 'Feedback retrieved successfully',
+    GET_FEEDBACKS_SUCCESS: 'Feedbacks retrieved successfully',
+    UPDATE_SUCCESS: 'Feedback updated successfully',
+    DELETE_SUCCESS: 'Feedback deleted successfully',
+  },
 };
 
 module.exports = MESSAGES;

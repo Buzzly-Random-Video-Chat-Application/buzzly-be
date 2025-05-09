@@ -6,6 +6,7 @@ const socketRoute = require('./socket.route');
 const reviewRoute = require('./review.route');
 const docsRoute = require('./docs.route');
 const blogRoute = require('./blog.route');
+const feedbackRoute = require('./feedback.route');
 
 const config = require('../../config/config');
 
@@ -17,6 +18,7 @@ const defaultRoutes = [
   { path: '/socket', route: socketRoute },
   { path: '/reviews', route: reviewRoute },
   { path: '/blogs', route: blogRoute },
+  { path: '/feedbacks', route: feedbackRoute },  
 ];
 
 const devRoutes = [

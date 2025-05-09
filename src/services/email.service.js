@@ -80,10 +80,45 @@ const sendVerificationEmail = async (to, token, name) => {
   await sendEmail(to, subject, html);
 };
 
+/**
+ * Send thank you feedback email to user
+ * @param {string} to - Recipient email address
+ * @param {string} name - User's name
+ * @returns {Promise}
+ */
+const sendThankYouFeedbackEmail = async (to, name) => {
+  const subject = 'Thank You for Your Feedback';
+  const html = await compileTemplate('thank-you-feedback.html', { name });
+  await sendEmail(to, subject, html);
+};
+
+/**
+ * Send feedback notification email to admin
+ * @param {string} to - Admin email address
+ * @param {Object} feedback - Feedback details
+ * @param {string} feedback.name - Name of the user who submitted feedback
+ * @param {string} feedback.email - Email of the user who submitted feedback
+ * @param {string} feedback.title - Title of the feedback
+ * @param {string} feedback.message - Feedback message
+ * @returns {Promise}
+ */
+const sendAdminFeedbackNotificationEmail = async (to, feedback) => {
+  const subject = 'New Feedback Received';
+  const html = await compileTemplate('admin-feedback-notification.html', {
+    name: feedback.name,
+    email: feedback.email,
+    title: feedback.title,
+    message: feedback.message,
+  });
+  await sendEmail(to, subject, html);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendWelcomeEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
+  sendThankYouFeedbackEmail,
+  sendAdminFeedbackNotificationEmail,
 };
