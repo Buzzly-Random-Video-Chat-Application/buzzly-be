@@ -1,7 +1,7 @@
 const express = require('express');
 const validate = require('../../middlewares/validate');
-const socketValidation = require('../../validations/socket.validation');
-const socketController = require('../../controllers/socket.controller');
+const { socketValidation } = require('../../validations');
+const { socketController } = require('../../controllers');
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ module.exports = router;
  * @swagger
  * tags:
  *   name: Socket
- *   description: 
+ *   description:
  */
 
 /**

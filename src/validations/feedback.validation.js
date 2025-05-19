@@ -7,7 +7,6 @@ const createFeedback = {
     email: Joi.string().required(),
     title: Joi.string().required(),
     message: Joi.string().required(),
-    userId: Joi.string().custom(objectId).required(),
   }),
 };
 const queryFeedbacks = {
@@ -22,8 +21,8 @@ const updateFeedback = {
     feedbackId: Joi.string().custom(objectId).required(),
   }),
   body: Joi.object()
-    .keys({ 
-        isProcessed: Joi.boolean(),
+    .keys({
+      isProcessed: Joi.boolean(),
     })
     .min(1),
 };

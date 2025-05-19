@@ -105,7 +105,7 @@ const blogSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 blogSchema.plugin(toJSON);

@@ -5,13 +5,13 @@ const MESSAGES = require('../constants/messages');
 const config = require('../config/config');
 
 const createFeedback = catchAsync(async (req, res) => {
-  const feedback = await feedbackService.createFeedback(req.body);
+  const result = await feedbackService.createFeedback(req.body);
   const { email, name } = req.body;
   await emailService.sendThankYouFeedbackEmail(email, name);
-  await emailService.sendAdminFeedbackNotificationEmail( config.email.from, feedback);
+  await emailService.sendAdminFeedbackNotificationEmail(config.email.from, req.body);
   res.status(httpStatus.CREATED).send({
     message: MESSAGES.FEEDBACK.CREATE_SUCCESS,
-    feedback,
+    result,
   });
 });
 
@@ -34,10 +34,10 @@ const queryFeedbacks = catchAsync(async (req, res) => {
 });
 
 const updateFeedback = catchAsync(async (req, res) => {
-  const feedback = await feedbackService.updateFeedback(req.params.feedbackId, req.body);
+  const result = await feedbackService.updateFeedback(req.params.feedbackId, req.body);
   res.send({
     message: MESSAGES.FEEDBACK.UPDATE_SUCCESS,
-    result: feedback,
+    result,
   });
 });
 const deleteFeedback = catchAsync(async (req, res) => {
@@ -48,11 +48,11 @@ const deleteFeedback = catchAsync(async (req, res) => {
 });
 
 const getFeedback = catchAsync(async (req, res) => {
-    const feedback = await feedbackService.getFeedback(req.params.feedbackId);
-    res.send({
-        message: MESSAGES.FEEDBACK.GET_FEEDBACK_SUCCESS,
-        result: feedback,
-    });
+  const result = await feedbackService.getFeedback(req.params.feedbackId);
+  res.send({
+    message: MESSAGES.FEEDBACK.GET_FEEDBACK_SUCCESS,
+    result,
+  });
 });
 
 module.exports = {

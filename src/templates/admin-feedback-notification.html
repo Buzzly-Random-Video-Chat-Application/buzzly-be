@@ -1,87 +1,149 @@
 <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== '' && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
 
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter((row) => row.some(filledCell));
 
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex(
+          (row, index) => row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length,
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
 
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return '';
+      }
+    }
+    return gk_fileData[filename] || '';
+  }
+</script>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Feedback Received</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@500;600&display=swap" rel="stylesheet" />
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; color: #1A1A2E; background-color: #F5F5F5;">
-  <div style="max-width: 700px; margin: 20px auto; background: #FFFFFF; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); overflow: hidden;">
-    <div style="position: relative; height: 200px; background: url('https://res.cloudinary.com/dj8tkuzxz/image/upload/v1746342013/q5ziji5zrewqu2oavjxs.png') no-repeat center/cover;">
-      <a href="https://buzzly-fe.vercel.app/" style="text-decoration: none; display: flex; align-items: center;">
-        <img src="https://res.cloudinary.com/dj8tkuzxz/image/upload/v1745858490/ver1rtlugxm91wowz7il.jpg" alt="Buzzly Logo" style="height: 50px; width: 50px; border-radius: 50%; margin: 20px;">
-      </a>
-    </div>
-    <div style="padding: 40px 30px; text-align: center; background-color: #F9FAFB;">
-      <h4 style="font-weight: 500; line-height: 1.8; font-size: 16px; margin: 0;">
-        Hello Admin,<br><br>
-        A new feedback has been submitted on Buzzly. Here are the details:<br><br>
-        <strong>Name:</strong> {{name}}<br>
-        <strong>Email:</strong> {{email}}<br>
-        <strong>Title:</strong> {{title}}<br>
-        <strong>Message:</strong> {{message}}<br><br>
-        <a href="https://buzzly-fe.vercel.app/feedbacks-management" style="display: inline-block; padding: 12px 25px; background: linear-gradient(90deg, #B9FF66, #90EE90); color: #1A1A2E; text-decoration: none; font-weight: 600; border-radius: 25px; border: none; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">View Dashboard</a><br><br>
-        Thanks,<br>
-        Buzzly Team
-      </h4>
-    </div>
-    <div style="background: linear-gradient(90deg, #B9FF66, #90EE90); padding: 20px; text-align: center;">
-      <p style="font-size: 12px; margin: 5px 0;">Copyright © 2024 | Buzzly</p>
-      <div style="display: inline-flex; align-items: center; padding: 5px 10px; border: 2px solid #1A1A2E; border-radius: 15px; margin: 10px 0;">
-        <a href="https://buzzly-fe.vercel.app/" style="text-decoration: none; color: #1A1A2E; font-weight: 600;">
-          Powered By
-          <img src="https://res.cloudinary.com/dj8tkuzxz/image/upload/v1745858490/ver1rtlugxm91wowz7il.jpg" alt="Buzzly Logo" style="height: 20px; margin-left: 5px; border-radius: 50%;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Feedback Received</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    style="margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; color: #1a1a2e; background-color: #f5f5f5"
+  >
+    <div
+      style="
+        max-width: 700px;
+        margin: 20px auto;
+        background: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      "
+    >
+      <div
+        style="
+          position: relative;
+          height: 200px;
+          background: url('https://res.cloudinary.com/dj8tkuzxz/image/upload/v1746342013/q5ziji5zrewqu2oavjxs.png')
+            no-repeat center/cover;
+        "
+      >
+        <a href="https://buzzly-fe.vercel.app/" style="text-decoration: none; display: flex; align-items: center">
+          <img
+            src="https://res.cloudinary.com/dj8tkuzxz/image/upload/v1745858490/ver1rtlugxm91wowz7il.jpg"
+            alt="Buzzly Logo"
+            style="height: 50px; width: 50px; border-radius: 50%; margin: 20px"
+          />
         </a>
       </div>
-      <div style="font-size: 10px; margin-top: 10px;">
-        <a href="https://buzzly-fe.vercel.app/privacy" style="color: #1A1A2E; text-decoration: none; margin: 0 5px;">Privacy Policy</a> |
-        <a href="https://buzzly-fe.vercel.app/terms" style="color: #1A1A2E; text-decoration: none; margin: 0 5px;">Terms of Service</a> |
-        <a href="https://buzzly-fe.vercel.app/contact" style="color: #1A1A2E; text-decoration: none; margin: 0 5px;">Contact Us</a>
+      <div style="padding: 40px 30px; text-align: center; background-color: #f9fafb">
+        <h4 style="font-weight: 500; line-height: 1.8; font-size: 16px; margin: 0">
+          Hello Admin,<br /><br />
+          A new feedback has been submitted on Buzzly. Here are the details:<br /><br />
+          <strong>Name:</strong> {{name}}<br />
+          <strong>Email:</strong> {{email}}<br />
+          <strong>Title:</strong> {{title}}<br />
+          <strong>Message:</strong> {{message}}<br /><br />
+          <a
+            href="https://buzzly-fe.vercel.app/feedbacks-management"
+            style="
+              display: inline-block;
+              padding: 12px 25px;
+              background: linear-gradient(90deg, #b9ff66, #90ee90);
+              color: #1a1a2e;
+              text-decoration: none;
+              font-weight: 600;
+              border-radius: 25px;
+              border: none;
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            "
+            >View Dashboard</a
+          ><br /><br />
+          Thanks,<br />
+          Buzzly Team
+        </h4>
       </div>
-      <p style="font-size: 10px; margin: 5px 0;">This is an automated message from Buzzly. Please do not reply to this email.</p>
+      <div style="background: linear-gradient(90deg, #b9ff66, #90ee90); padding: 20px; text-align: center">
+        <p style="font-size: 12px; margin: 5px 0">Copyright © 2024 | Buzzly</p>
+        <div
+          style="
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border: 2px solid #1a1a2e;
+            border-radius: 15px;
+            margin: 10px 0;
+          "
+        >
+          <a href="https://buzzly-fe.vercel.app/" style="text-decoration: none; color: #1a1a2e; font-weight: 600">
+            Powered By
+            <img
+              src="https://res.cloudinary.com/dj8tkuzxz/image/upload/v1745858490/ver1rtlugxm91wowz7il.jpg"
+              alt="Buzzly Logo"
+              style="height: 20px; margin-left: 5px; border-radius: 50%"
+            />
+          </a>
+        </div>
+        <div style="font-size: 10px; margin-top: 10px">
+          <a href="https://buzzly-fe.vercel.app/privacy" style="color: #1a1a2e; text-decoration: none; margin: 0 5px"
+            >Privacy Policy</a
+          >
+          |
+          <a href="https://buzzly-fe.vercel.app/terms" style="color: #1a1a2e; text-decoration: none; margin: 0 5px"
+            >Terms of Service</a
+          >
+          |
+          <a href="https://buzzly-fe.vercel.app/contact" style="color: #1a1a2e; text-decoration: none; margin: 0 5px"
+            >Contact Us</a
+          >
+        </div>
+        <p style="font-size: 10px; margin: 5px 0">
+          This is an automated message from Buzzly. Please do not reply to this email.
+        </p>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

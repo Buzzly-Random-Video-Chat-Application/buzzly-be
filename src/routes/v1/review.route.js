@@ -16,9 +16,7 @@ router
   .patch(auth('update'), validate(reviewValidation.updateReview), reviewController.updateReview)
   .delete(auth('delete'), validate(reviewValidation.deleteReview), reviewController.deleteReview);
 
-router
-  .route('/app-rating')
-  .get(reviewController.getAppRating);
+router.route('/app-rating').get(reviewController.getAppRating);
 
 module.exports = router;
 

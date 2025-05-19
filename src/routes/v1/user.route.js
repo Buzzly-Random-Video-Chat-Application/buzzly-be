@@ -20,7 +20,12 @@ router
 
 router
   .route('/:userId/avatar')
-  .patch(auth('update'), upload.single('avatar'), validate(userValidation.updateUserAvatar), userController.updateUserAvatar);
+  .patch(
+    auth('update'),
+    upload.single('avatar'),
+    validate(userValidation.updateUserAvatar),
+    userController.updateUserAvatar,
+  );
 
 router
   .route('/:userId/review')
@@ -44,7 +49,7 @@ router
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
- *       content: 
+ *       content:
  *         application/json:
  *           schema:
  *             type: object
@@ -232,6 +237,7 @@ router
  *                 description: User's gender
  *               nationality:
  *                 type: string
+ *                 enum: [VN, US, CN, JP, KR]
  *                 description: User's nationality
  *               hashTags:
  *                 type: array
@@ -252,7 +258,7 @@ router
  *             example:
  *               name: fake name
  *               gender: male
- *               nationality: Vietnam
+ *               nationality: VN
  *               hashTags: ["Hello", "Buzzlier"]
  *               aboutMe: Hello my name is fake name.
  *               preferredLanguage: ["VN", "CN"]
@@ -524,7 +530,7 @@ router
  *         isEmailVerified: false
  *         avatar: "https://res.cloudinary.com/dj8tkuzxz/image/upload/avatar_default_vzd9hu.png"
  *         gender: "male"
- *         nationality: "Vietnam"
+ *         nationality: "VN"
  *         hashTags: ["travel", "food"]
  *         aboutMe: "Software engineer with a passion for coding"
  *         preferredLanguage: ["EN", "VN"]

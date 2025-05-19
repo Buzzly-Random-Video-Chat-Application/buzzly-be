@@ -14,7 +14,7 @@ router
     upload.single('image'),
     parseContent,
     validate(blogValidation.createBlog),
-    blogController.createBlog
+    blogController.createBlog,
   )
   .get(validate(blogValidation.getBlogs), blogController.getBlogs);
 
@@ -26,13 +26,11 @@ router
     upload.single('image'),
     parseContent,
     validate(blogValidation.updateBlog),
-    blogController.updateBlog
+    blogController.updateBlog,
   )
   .delete(auth('manage'), validate(blogValidation.deleteBlog), blogController.deleteBlog);
 
-router
-  .route('/:blogId/pin')
-  .put(auth('manage'), validate(blogValidation.pinBlog), blogController.pinBlog);
+router.route('/:blogId/pin').put(auth('manage'), validate(blogValidation.pinBlog), blogController.pinBlog);
 
 module.exports = router;
 

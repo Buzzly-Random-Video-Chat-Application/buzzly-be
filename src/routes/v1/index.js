@@ -7,6 +7,8 @@ const reviewRoute = require('./review.route');
 const docsRoute = require('./docs.route');
 const blogRoute = require('./blog.route');
 const feedbackRoute = require('./feedback.route');
+const statisticRoute = require('./statistic.route');
+const livestreamRoute = require('./livestream.route');
 
 const config = require('../../config/config');
 
@@ -18,18 +20,18 @@ const defaultRoutes = [
   { path: '/socket', route: socketRoute },
   { path: '/reviews', route: reviewRoute },
   { path: '/blogs', route: blogRoute },
-  { path: '/feedbacks', route: feedbackRoute },  
+  { path: '/feedbacks', route: feedbackRoute },
+  { path: '/statistics', route: statisticRoute },
+  { path: '/livestreams', route: livestreamRoute },
 ];
 
-const devRoutes = [
-  { path: '/docs', route: docsRoute },
-];
+const devRoutes = [{ path: '/docs', route: docsRoute }];
 
 defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
 
-if (config.env === 'development') {  
+if (config.env === 'development') {
   devRoutes.forEach((route) => {
     router.use(route.path, route.route);
   });

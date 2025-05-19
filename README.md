@@ -57,6 +57,7 @@
 </details>
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 [![Buzzly Screenshot][product-screenshot]](https://buzzly-fe.vercel.app/)
@@ -64,6 +65,7 @@
 Buzzly Backend is the server-side component of a random video chat platform designed to connect users worldwide through seamless video conversations. By integrating AI-powered features, it enhances interactions with real-time conversation suggestions, language translation, and personalized matchmaking. The project addresses limitations in existing platforms, such as poor conversation quality and language barriers, delivering a secure, scalable, and engaging experience.
 
 **Key Features:**
+
 - Real-time video chat with low-latency streaming via WebRTC and Socket.io.
 - AI-driven conversation suggestions and real-time language translation.
 - Scalable architecture using Node.js, Express.js, MongoDB, and Redis.
@@ -87,6 +89,7 @@ Developed as a capstone project at the University of Information Technology, VNU
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 Follow these steps to set up the Buzzly Backend locally.
@@ -134,6 +137,7 @@ Follow these steps to set up the Buzzly Backend locally.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
 The Buzzly Backend provides a RESTful API and real-time communication. Examples:
@@ -150,6 +154,7 @@ API documentation: [https://github.com/nquynqthanq/buzzly-be/wiki](https://githu
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
+
 ## Roadmap
 
 - [x] Core video chat with WebRTC
@@ -165,6 +170,7 @@ See open issues: [https://github.com/nquynqthanq/buzzly-be/issues](https://githu
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 Contributions are welcome! To contribute:
@@ -178,6 +184,7 @@ Contributions are welcome! To contribute:
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the Unlicense License. See \`LICENSE.txt\` for details.
@@ -185,6 +192,7 @@ Distributed under the Unlicense License. See \`LICENSE.txt\` for details.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTACT -->
+
 ## Contact
 
 Nguyen Quoc Thang - [https://linkedin.com/in/nquynqthanq](https://linkedin.com/in/nquynqthanq) - nquynqthanq@example.com
@@ -194,6 +202,7 @@ Project Link: [https://github.com/nquynqthanq/buzzly-be](https://github.com/nquy
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ACKNOWLEDGMENTS -->
+
 ## Acknowledgments
 
 - University of Information Technology, VNU-HCM
@@ -206,6 +215,7 @@ Project Link: [https://github.com/nquynqthanq/buzzly-be](https://github.com/nquy
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/nquynqthanq/buzzly-be.svg?style=for-the-badge
 [contributors-url]: https://github.com/nquynqthanq/buzzly-be/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/nquynqthanq/buzzly-be.svg?style=for-the-badge

@@ -4,10 +4,10 @@ const { reviewService } = require('../services');
 const MESSAGES = require('../constants/messages');
 
 const createReview = catchAsync(async (req, res) => {
-  const review = await reviewService.createReview(req.body);
+  const result = await reviewService.createReview(req.body);
   res.status(httpStatus.CREATED).send({
     message: MESSAGES.REVIEW.CREATE_SUCCESS,
-    review,
+    result,
   });
 });
 
@@ -18,7 +18,7 @@ const queryReviews = catchAsync(async (req, res) => {
     limit: req.query.limit,
     page: req.query.page,
   };
-  const {results, page, limit, totalPages, totalResults} = await reviewService.queryReviews(filter, options);
+  const { results, page, limit, totalPages, totalResults } = await reviewService.queryReviews(filter, options);
   res.send({
     message: MESSAGES.REVIEW.GET_REVIEWS_SUCCESS,
     results,
@@ -30,10 +30,10 @@ const queryReviews = catchAsync(async (req, res) => {
 });
 
 const updateReview = catchAsync(async (req, res) => {
-  const review = await reviewService.updateReview(req.params.reviewId, req.body);
+  const result = await reviewService.updateReview(req.params.reviewId, req.body);
   res.send({
     message: MESSAGES.REVIEW.UPDATE_SUCCESS,
-    result: review,
+    result,
   });
 });
 
@@ -45,15 +45,7 @@ const deleteReview = catchAsync(async (req, res) => {
 });
 
 const getAppRating = catchAsync(async (req, res) => {
-  const { 
-    average,
-    belowAverage,
-    excellent,
-    good,
-    poor,
-    rating,
-    reviewCount,
-  } = await reviewService.getAppRating();
+  const { average, belowAverage, excellent, good, poor, rating, reviewCount } = await reviewService.getAppRating();
   res.send({
     message: MESSAGES.REVIEW.APP_RATING_SUCCESS,
     average,

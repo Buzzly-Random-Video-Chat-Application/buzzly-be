@@ -1,21 +1,21 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const feedbackValidation = require('../../validations/feedback.validation');
-const feedbackController = require('../../controllers/feedback.controller');
+const { feedbackValidation } = require('../../validations');
+const { feedbackController } = require('../../controllers');
 
 const router = express.Router();
 
 router
-    .route('/')
-    .post(auth('create'), validate(feedbackValidation.createFeedback), feedbackController.createFeedback)
-    .get(auth('manage'), validate(feedbackValidation.queryFeedbacks), feedbackController.queryFeedbacks);
+  .route('/')
+  .post(validate(feedbackValidation.createFeedback), feedbackController.createFeedback)
+  .get(auth('manage'), validate(feedbackValidation.queryFeedbacks), feedbackController.queryFeedbacks);
 
 router
-    .route('/:feedbackId')
-    .patch(auth('manage'), validate(feedbackValidation.updateFeedback), feedbackController.updateFeedback)
-    .delete(auth('manage'), validate(feedbackValidation.deleteFeedback), feedbackController.deleteFeedback)
-    .get(auth('manage'), validate(feedbackValidation.getFeedback), feedbackController.getFeedback);
+  .route('/:feedbackId')
+  .patch(auth('manage'), validate(feedbackValidation.updateFeedback), feedbackController.updateFeedback)
+  .delete(auth('manage'), validate(feedbackValidation.deleteFeedback), feedbackController.deleteFeedback)
+  .get(auth('manage'), validate(feedbackValidation.getFeedback), feedbackController.getFeedback);
 
 module.exports = router;
 
@@ -33,8 +33,6 @@ module.exports = router;
  *     summary: Create a feedback
  *     description: Create a new feedback. Requires authentication and create permission.
  *     tags: [Feedbacks]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -46,7 +44,6 @@ module.exports = router;
  *               - email
  *               - title
  *               - message
- *               - userId
  *             properties:
  *               name:
  *                 type: string
@@ -61,15 +58,11 @@ module.exports = router;
  *               message:
  *                 type: string
  *                 description: Content of the feedback
- *               userId:
- *                 type: string
- *                 description: ID of the user submitting the feedback
  *             example:
  *               name: John Doe
  *               email: john.doe@example.com
  *               title: App Improvement Suggestion
  *               message: I think adding a dark mode would be great!
- *               userId: 60d0fe4f5311236168a109ca
  *     responses:
  *       "201":
  *         description: Feedback created successfully
@@ -143,7 +136,6 @@ module.exports = router;
  *                     email: john.doe@example.com
  *                     title: App Improvement Suggestion
  *                     message: I think adding a dark mode would be great!
- *                     userId: 60d0fe4f5311236168a109ca
  *                     isProcessed: false
  *                     createdAt: 2025-05-09T12:00:00Z
  *                     updatedAt: 2025-05-09T12:00:00Z
@@ -307,9 +299,6 @@ module.exports = router;
  *         message:
  *           type: string
  *           description: Content of the feedback
- *         userId:
- *           type: string
- *           description: ID of the user submitting the feedback
  *         isProcessed:
  *           type: boolean
  *           description: Whether the feedback has been processed
@@ -327,7 +316,6 @@ module.exports = router;
  *         email: john.doe@example.com
  *         title: App Improvement Suggestion
  *         message: I think adding a dark mode would be great!
- *         userId: 60d0fe4f5311236168a109ca
  *         isProcessed: false
  *         createdAt: 2025-05-09T12:00:00Z
  *         updatedAt: 2025-05-09T12:00:00Z

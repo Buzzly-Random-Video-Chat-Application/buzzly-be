@@ -14,7 +14,10 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: process.env.NODE_ENV === 'production' ? 'https://buzzly-be.onrender.com/v1' : `http://localhost:${config.port}/v1`,
+      url:
+        process.env.NODE_ENV === 'production'
+          ? 'https://buzzly-be.onrender.com/v1'
+          : `http://localhost:${config.port}/v1`,
       description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Local development server',
     },
   ],

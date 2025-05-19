@@ -19,10 +19,7 @@ const createBlog = {
     description: Joi.string().required().trim(),
     image_title: Joi.string().required().trim(),
     content: Joi.alternatives()
-      .try(
-        Joi.array().items(blogContentSchema).max(10).min(1),
-        blogContentSchema
-      )
+      .try(Joi.array().items(blogContentSchema).max(10).min(1), blogContentSchema)
       .custom((value, helpers) => {
         if (!Array.isArray(value)) {
           return [value];

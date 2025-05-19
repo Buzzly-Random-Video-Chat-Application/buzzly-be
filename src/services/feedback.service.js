@@ -9,7 +9,7 @@ const ApiError = require('../utils/ApiError');
  */
 const createFeedback = async (feedbackBody) => {
   return Feedback.create(feedbackBody);
-}
+};
 
 /**
  * Query for feedbacks
@@ -25,7 +25,7 @@ const queryFeedbacks = async (filter, options) => {
   const updatedOptions = { ...options, sortBy };
   const feedbacks = await Feedback.paginate(filter, updatedOptions);
   return feedbacks;
-}
+};
 
 /**
  * Update feedback by ID
@@ -41,7 +41,7 @@ const updateFeedback = async (feedbackId, updateBody) => {
   Object.assign(feedback, updateBody);
   await feedback.save();
   return feedback;
-}
+};
 
 /**
  * Delete feedback by ID
@@ -55,7 +55,7 @@ const deleteFeedback = async (feedbackId) => {
   }
   await feedback.deleteOne();
   return feedback;
-}
+};
 
 /**
  * Get feedback by ID
@@ -63,14 +63,14 @@ const deleteFeedback = async (feedbackId) => {
  * @returns {Promise<Feedback>}
  */
 const getFeedback = async (id) => {
-    const feedback = await Feedback.findById(id);
-    return feedback;
-}
+  const feedback = await Feedback.findById(id);
+  return feedback;
+};
 
 module.exports = {
-    createFeedback,
-    queryFeedbacks,
-    updateFeedback,
-    deleteFeedback,
-    getFeedback,
+  createFeedback,
+  queryFeedbacks,
+  updateFeedback,
+  deleteFeedback,
+  getFeedback,
 };

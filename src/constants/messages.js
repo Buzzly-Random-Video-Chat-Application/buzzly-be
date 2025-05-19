@@ -62,6 +62,31 @@ const MESSAGES = {
     UPDATE_SUCCESS: 'Feedback updated successfully',
     DELETE_SUCCESS: 'Feedback deleted successfully',
   },
+  STATISTIC: {
+    GET_USER_STATISTICS_SUCCESS: 'User statistics retrieved successfully',
+    GET_CONNECTION_STATISTICS_SUCCESS: 'Connection statistics retrieved successfully',
+    GET_WEEKLY_CONNECTION_STATISTICS_SUCCESS: 'Weekly connection statistics retrieved successfully',
+    GET_REVIEW_STATISTICS_SUCCESS: 'Review statistics retrieved successfully',
+
+    GET_USER_STATISTICS_FAILED: 'Failed to retrieve user statistics',
+    GET_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve connection statistics',
+    GET_WEEKLY_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve weekly connection statistics',
+    GET_REVIEW_STATISTICS_FAILED: 'Failed to retrieve review statistics',
+  },
+  LIVESTREAM: {
+    CREATE_SUCCESS: 'Live stream created successfully',
+    GET_STREAMS_SUCCESS: 'Live streams retrieved successfully',
+    GET_STREAM_SUCCESS: 'Live stream retrieved successfully',
+    UPDATE_SUCCESS: 'Live stream updated successfully',
+    DELETE_SUCCESS: 'Live stream deleted successfully',
+    GET_ACTIVE_STREAMS_SUCCESS: 'Active live streams retrieved successfully',
+
+    CREATE_FAILED: 'Failed to create live stream',
+    GET_STREAM_FAILED: 'Failed to retrieve live stream',
+    UPDATE_FAILED: 'Failed to update live stream',
+    DELETE_FAILED: 'Failed to delete live stream',
+    GET_ACTIVE_STREAMS_FAILED: 'Failed to retrieve active live streams',
+  },
 };
 
 module.exports = MESSAGES;

@@ -5,3 +5,6 @@ module.exports.userService = require('./user.service');
 module.exports.reviewService = require('./review.service');
 module.exports.blogService = require('./blog.service');
 module.exports.feedbackService = require('./feedback.service');
+module.exports.statisticService = require('./statistic.service');
+module.exports.connectionService = require('./connection.service');
+module.exports.livestreamService = require('./livestream.service');

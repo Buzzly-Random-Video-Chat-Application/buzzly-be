@@ -1,5 +1,25 @@
-const { handelStart, getType, handelDisconnect } = require('./lib');
-const { incrementOnline, decrementOnline, getOnline, getRoom, deleteRoom } = require('../config/redis');
+const {
+  handleRcStart,
+  handleRcDisconnect,
+  handleRcIceSend,
+  handleRcSdpSend,
+  handleRcSendMessage,
+  handleRcEndChat,
+  handleRcNextChat,
+
+  handleStartLivestream,
+  handleJoinLivestream,
+  handleSendMessage,
+  handleHostIceSend,
+  handleGuestIceSend,
+  handleHostSdpSend,
+  handleGuestSdpSend,
+  handleEndLivestream,
+  handleNextLivestream,
+  handleLeaveLivestream,
+  handleDisconnect,
+} = require('./lib');
+const { incrementOnline, decrementOnline, getOnline } = require('../config/redis');
 const logger = require('../config/logger');
 
 const setupSocketIO = (io) => {
@@ -9,85 +29,96 @@ const setupSocketIO = (io) => {
       .then((count) => io.emit('online', count))
       .catch((error) => logger.error('Error updating online count:', error));
 
-    socket.on('start', ({ selectedGender, selectedCountry }, cb) => {
-      handelStart(selectedGender, selectedCountry, socket, cb, io);
+    socket.on('rc_start', ({ selectedGender, selectedCountry }, cb) => {
+      socket.data.connectionType = 'rc';
+      handleRcStart(selectedGender, selectedCountry, socket, cb, io);
     });
 
-    socket.on('disconnect', () => {
-      decrementOnline()
+    socket.on('rc_ice:send', ({ candidate, to }) => {
+      handleRcIceSend({ candidate, to }, socket, io);
+    });
+
+    socket.on('rc_sdp:send', ({ sdp, to }) => {
+      handleRcSdpSend({ sdp, to }, socket, io);
+    });
+
+    socket.on('rc_send-message', (input, type, roomId) => {
+      handleRcSendMessage(input, type, roomId, socket, io);
+    });
+
+    socket.on('rc_end-chat', (roomId) => {
+      handleRcEndChat(roomId, socket, io);
+    });
+
+    socket.on('rc_next-chat', (roomId) => {
+      handleRcNextChat(roomId, socket, io);
+    });
+
+    socket.on('start:livestream', ({ livestreamName, livestreamGreeting, livestreamAnnouncement }, cb) => {
+      handleStartLivestream({ livestreamName, livestreamGreeting, livestreamAnnouncement }, socket, cb, io);
+      // emit tương ứng: 'livestream:started'
+    });
+
+    socket.on('host:ice:send', ({ livestreamId, candidate, to }) => {
+      handleHostIceSend({ livestreamId, candidate, to }, socket, io);
+      // emit tương ứng: 'host:ice:reply'
+    });
+
+    socket.on('host:sdp:send', ({ livestreamId, sdp, to }) => {
+      handleHostSdpSend({ livestreamId, sdp, to }, socket, io);
+      // emit tương ứng: 'host:sdp:reply'
+    });
+
+    socket.on('end:livestream', ({ livestreamId }) => {
+      handleEndLivestream({ livestreamId }, socket, io);
+      // emit tương ứng: 'livestream:ended'
+    });
+
+    socket.on('join:livestream', ({ livestreamId }, cb) => {
+      handleJoinLivestream({ livestreamId }, socket, cb, io);
+      // emit tương ứng: 'livestream:joined'
+    });
+
+    socket.on('guest:ice:send', ({ livestreamId, candidate, to }) => {
+      handleGuestIceSend({ livestreamId, candidate, to }, socket, io);
+      // emit tương ứng: 'guest:ice:reply'
+    });
+
+    socket.on('guest:sdp:send', ({ livestreamId, sdp, to }) => {
+      handleGuestSdpSend({ livestreamId, sdp, to }, socket, io);
+      // emit tương ứng: 'guest:sdp:reply'
+    });
+
+    socket.on('next:livestream', ({ livestreamId }) => {
+      handleNextLivestream({ livestreamId }, socket, io);
+      // emit tương ứng: 'livestream:next'
+    });
+
+    socket.on('leave:livestream', ({ livestreamId }) => {
+      handleLeaveLivestream({ livestreamId }, socket, io);
+      // emit tương ứng: 'livestream:left'
+    });
+
+    socket.on('send:message', ({ livestreamId, message, type }) => {
+      handleSendMessage({ livestreamId, message, type }, socket, io);
+      // emit tương ứng: 'message:sent'
+    });
+
+    socket.on('disconnect', async () => {
+      await decrementOnline()
         .then(() => getOnline())
         .then((count) => io.emit('online', count))
         .catch((error) => logger.error('Error updating online count:', error));
-      
-      handelDisconnect(socket.id, io);
-      logger.info(`Socket disconnected`);
-    });
 
-    socket.on('ice:send', async ({ candidate, to }) => {
-      const type = await getType(socket.id);
-      if (type && ((type.type === 'p1' && type.p2id === to) || (type.type === 'p2' && type.p1id === to))) {
-        const toSocket = io.sockets.sockets.get(to);
-        if (toSocket && toSocket.connected) {
-          io.to(to).emit('ice:reply', { candidate, from: socket.id });
-          setTimeout(() => {
-            if (!io.sockets.sockets.get(to)) {
-              socket.emit('error', 'Peer unavailable');
-            }
-          }, 5000);
-        } else {
-          socket.emit('error', 'Peer disconnected');
-        }
-      }
-    });
-
-    socket.on('sdp:send', async ({ sdp, to }) => {
-      const type = await getType(socket.id);
-      if (type && ((type.type === 'p1' && type.p2id === to) || (type.type === 'p2' && type.p1id === to))) {
-        const toSocket = io.sockets.sockets.get(to);
-        if (toSocket && toSocket.connected) {
-          io.to(to).emit('sdp:reply', { sdp, from: socket.id });
-        } else {
-          socket.emit('error', 'Peer disconnected');
-        }
-      }
-    });
-
-    socket.on('send-message', (input, type, roomid) => {
-      socket.to(roomid).emit('get-message', input, type);
-    });
-
-    // Thêm sự kiện end-chat
-    socket.on('end-chat', async (roomId) => {
-      const room = await getRoom(roomId);
-      if (!room) {
-        socket.emit('error', 'Room not found');
-        return;
+      if (socket.data.connectionType === 'lt') {
+        await handleDisconnect(socket.id, socket, io);
       }
 
-      // Thông báo cho tất cả người dùng trong room thoát
-      io.to(roomId).emit('end-chat');
-
-      // Xóa room khỏi Redis
-      await deleteRoom(roomId);
-
-      logger.info(`Room ${roomId} ended by ${socket.id}`);
-    });
-
-    // Thêm sự kiện next-chat
-    socket.on('next-chat', async (roomId) => {
-      const room = await getRoom(roomId);
-      if (!room) {
-        socket.emit('error', 'Room not found');
-        return;
+      if (socket.data.connectionType === 'rc') {
+        await handleRcDisconnect(socket.id, io);
       }
 
-      // Thông báo cho tất cả người dùng trong room bắt đầu tìm kiếm mới
-      io.to(roomId).emit('next-chat');
-
-      // Xóa room khỏi Redis
-      await deleteRoom(roomId);
-
-      logger.info(`Room ${roomId} ended for next chat by ${socket.id}`);
+      logger.info(`Socket disconnected: ${socket.id}`);
     });
   });
 };

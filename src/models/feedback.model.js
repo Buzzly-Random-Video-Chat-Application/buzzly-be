@@ -30,11 +30,6 @@ const feedbackSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
     isProcessed: {
       type: Boolean,
       default: false,
@@ -42,7 +37,7 @@ const feedbackSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 feedbackSchema.plugin(toJSON);

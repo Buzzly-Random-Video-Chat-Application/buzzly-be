@@ -11,14 +11,14 @@ const createBlog = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Image file is required');
   }
   const image = await cloudinary.uploadImage(req.file.buffer);
-  const blog = await blogService.createBlog({
+  const result = await blogService.createBlog({
     ...req.body,
     author: req.user._id,
     image: image.secure_url,
   });
   res.status(httpStatus.CREATED).send({
     message: MESSAGES.BLOG.CREATE_SUCCESS,
-    blog,
+    result,
   });
 });
 
@@ -37,10 +37,10 @@ const getBlogs = catchAsync(async (req, res) => {
 });
 
 const getBlog = catchAsync(async (req, res) => {
-  const blog = await blogService.getBlog(req.params.blogId);
+  const result = await blogService.getBlog(req.params.blogId);
   res.send({
     message: MESSAGES.BLOG.GET_BLOG_SUCCESS,
-    result: blog,
+    result,
   });
 });
 
@@ -49,10 +49,10 @@ const updateBlog = catchAsync(async (req, res) => {
     const image = await cloudinary.uploadImage(req.file.buffer);
     req.body.image = image.secure_url;
   }
-  const blog = await blogService.updateBlog(req.params.blogId, req.body);
+  const result = await blogService.updateBlog(req.params.blogId, req.body);
   res.send({
     message: MESSAGES.BLOG.UPDATE_SUCCESS,
-    result: blog,
+    result,
   });
 });
 
@@ -64,10 +64,10 @@ const deleteBlog = catchAsync(async (req, res) => {
 });
 
 const pinBlog = catchAsync(async (req, res) => {
-  const blog = await blogService.pinBlog(req.params.blogId);
+  const result = await blogService.pinBlog(req.params.blogId);
   res.send({
     message: MESSAGES.BLOG.PIN_SUCCESS,
-    result: blog,
+    result,
   });
 });
 

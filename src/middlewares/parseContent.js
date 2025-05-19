@@ -8,5 +8,5 @@ const parseContent = (req, res, next) => {
   }
   next();
 };
-  
+
 module.exports = parseContent;

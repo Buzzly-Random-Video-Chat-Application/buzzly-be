@@ -63,7 +63,7 @@ const userSchema = mongoose.Schema(
     nationality: {
       type: String,
       trim: true,
-      default: 'Vietnam',
+      default: 'VN',
     },
     hashTags: {
       type: [String],
@@ -103,11 +103,11 @@ const userSchema = mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // add plugin that converts mongoose to json

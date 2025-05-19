@@ -2,28 +2,28 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
 const reviewSchema = mongoose.Schema(
-    {
-        rating: {
-            type: Number,
-            required: true,
-            min: 1,
-            max: 5,
-        },
-        review: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
-        },
+  {
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
     },
-    {
-        timestamps: true,
-    }
-)
+    review: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 // add plugin that converts mongoose to json
 reviewSchema.plugin(toJSON);

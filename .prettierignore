@@ -1,3 +1,8 @@
 node_modules
-coverage
-
+/.cache
+.eslintignore
+.gitignore
+.git
+LICENSE
+build
+dist

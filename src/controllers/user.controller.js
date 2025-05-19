@@ -29,22 +29,22 @@ const getUsers = catchAsync(async (req, res) => {
 });
 
 const getUser = catchAsync(async (req, res) => {
-  const user = await userService.getUser(req.params.userId);
-  if (!user) {
+  const result = await userService.getUser(req.params.userId);
+  if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
   res.send({
     message: MESSAGES.USER.GET_USER_SUCCESS,
-    result: user
+    result,
   });
 });
 
 const updateUser = catchAsync(async (req, res) => {
   const updateBody = { ...req.body };
-  const user = await userService.updateUser(req.params.userId, updateBody);
+  const result = await userService.updateUser(req.params.userId, updateBody);
   res.send({
     message: MESSAGES.USER.UPDATE_SUCCESS,
-    result: user,
+    result,
   });
 });
 
@@ -57,10 +57,10 @@ const deleteUser = catchAsync(async (req, res) => {
 
 const updateIsShowReview = catchAsync(async (req, res) => {
   const { isShowReview } = req.body;
-  const user = await userService.updateUser(req.params.userId, { isShowReview });
+  const result = await userService.updateUser(req.params.userId, { isShowReview });
   res.send({
     message: MESSAGES.USER.UPDATE_REVIEW_VISIBILITY_SUCCESS,
-    result: user,
+    result,
   });
 });
 
@@ -71,10 +71,10 @@ const updateUserAvatar = catchAsync(async (req, res) => {
 
   try {
     const uploadedImage = await cloudinary.uploadImage(req.file.buffer);
-    const user = await userService.updateUser(req.params.userId, { avatar: uploadedImage.secure_url });
+    const result = await userService.updateUser(req.params.userId, { avatar: uploadedImage.secure_url });
     res.send({
       message: MESSAGES.USER.UPDATE_AVATAR_SUCCESS,
-      result: user,
+      result,
     });
   } catch (error) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to upload avatar');
