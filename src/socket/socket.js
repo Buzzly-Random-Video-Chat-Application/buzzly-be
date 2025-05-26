@@ -1,126 +1,121 @@
 const {
-  handleRcStart,
-  handleRcDisconnect,
-  handleRcIceSend,
-  handleRcSdpSend,
-  handleRcSendMessage,
-  handleRcEndChat,
-  handleRcNextChat,
+  handleRandomChatStart,
+  handleRandomChatDisconnect,
+  handleRandomChatSendMessage,
+  handleRandomChatEndChat,
+  handleRandomChatNextChat,
 
-  handleStartLivestream,
-  handleJoinLivestream,
-  handleSendMessage,
-  handleHostIceSend,
-  handleGuestIceSend,
-  handleHostSdpSend,
-  handleGuestSdpSend,
-  handleEndLivestream,
-  handleNextLivestream,
-  handleLeaveLivestream,
-  handleDisconnect,
-} = require('./lib');
-const { incrementOnline, decrementOnline, getOnline } = require('../config/redis');
+  handleGetRouterRtpCapabilities,
+  handleCreateWebRtcTransport,
+  handleConnectTransport,
+  handleProduce,
+  handleConsume,
+  handleCloseTransport,
+  handleCloseProducer,
+  handleCloseConsumer,
+} = require('./handlers');
+const { increVideoChatOnline, decreVideoChatOnline, getVideoChatOnline } = require('../config/redis');
 const logger = require('../config/logger');
+const { createRouter } = require('../mediasoup/router');
 
-const setupSocketIO = (io) => {
+const initializeSocket = (io) => {
   io.on('connection', (socket) => {
-    incrementOnline()
-      .then(() => getOnline())
-      .then((count) => io.emit('online', count))
+    logger.info(`Client connected: ${socket.id}`);
+
+    increVideoChatOnline()
+      .then(() => getVideoChatOnline())
+      .then((count) => io.emit('random-chat-online', count))
       .catch((error) => logger.error('Error updating online count:', error));
 
-    socket.on('rc_start', ({ selectedGender, selectedCountry }, cb) => {
-      socket.data.connectionType = 'rc';
-      handleRcStart(selectedGender, selectedCountry, socket, cb, io);
+    socket.on('random-chat:start', ({ selectedGender, selectedCountry }, cb) => {
+      socket.data.type = 'random-chat';
+      handleRandomChatStart(selectedGender, selectedCountry, socket, cb, io);
     });
 
-    socket.on('rc_ice:send', ({ candidate, to }) => {
-      handleRcIceSend({ candidate, to }, socket, io);
+    socket.on('random-chat:send-message', (input, type, roomId) => {
+      handleRandomChatSendMessage(input, type, roomId, socket, io);
     });
 
-    socket.on('rc_sdp:send', ({ sdp, to }) => {
-      handleRcSdpSend({ sdp, to }, socket, io);
+    socket.on('random-chat:end-chat', (roomId) => {
+      handleRandomChatEndChat(roomId, socket, io);
     });
 
-    socket.on('rc_send-message', (input, type, roomId) => {
-      handleRcSendMessage(input, type, roomId, socket, io);
+    socket.on('random-chat:next-chat', (roomId) => {
+      handleRandomChatNextChat(roomId, socket, io);
     });
 
-    socket.on('rc_end-chat', (roomId) => {
-      handleRcEndChat(roomId, socket, io);
+    // Mediasoup event handlers
+    socket.on('mediasoup:get-router-rtp-capabilities', (roomId) => {
+      handleGetRouterRtpCapabilities(socket, roomId);
     });
 
-    socket.on('rc_next-chat', (roomId) => {
-      handleRcNextChat(roomId, socket, io);
+    socket.on('mediasoup:create-transport', (data, callback) => {
+      handleCreateWebRtcTransport(socket, data, callback);
     });
 
-    socket.on('start:livestream', ({ livestreamName, livestreamGreeting, livestreamAnnouncement }, cb) => {
-      handleStartLivestream({ livestreamName, livestreamGreeting, livestreamAnnouncement }, socket, cb, io);
-      // emit tương ứng: 'livestream:started'
+    socket.on('mediasoup:connect-transport', (data) => {
+      handleConnectTransport(socket, data);
     });
 
-    socket.on('host:ice:send', ({ livestreamId, candidate, to }) => {
-      handleHostIceSend({ livestreamId, candidate, to }, socket, io);
-      // emit tương ứng: 'host:ice:reply'
+    socket.on('mediasoup:produce', (data, callback) => {
+      handleProduce(socket, data, callback);
     });
 
-    socket.on('host:sdp:send', ({ livestreamId, sdp, to }) => {
-      handleHostSdpSend({ livestreamId, sdp, to }, socket, io);
-      // emit tương ứng: 'host:sdp:reply'
+    socket.on('mediasoup:consume', (data, callback) => {
+      handleConsume(socket, data, callback);
     });
 
-    socket.on('end:livestream', ({ livestreamId }) => {
-      handleEndLivestream({ livestreamId }, socket, io);
-      // emit tương ứng: 'livestream:ended'
+    socket.on('mediasoup:close-transport', (data) => {
+      handleCloseTransport(socket, data);
     });
 
-    socket.on('join:livestream', ({ livestreamId }, cb) => {
-      handleJoinLivestream({ livestreamId }, socket, cb, io);
-      // emit tương ứng: 'livestream:joined'
+    socket.on('mediasoup:close-producer', (data) => {
+      handleCloseProducer(socket, data);
     });
 
-    socket.on('guest:ice:send', ({ livestreamId, candidate, to }) => {
-      handleGuestIceSend({ livestreamId, candidate, to }, socket, io);
-      // emit tương ứng: 'guest:ice:reply'
+    socket.on('mediasoup:close-consumer', (data) => {
+      handleCloseConsumer(socket, data);
     });
 
-    socket.on('guest:sdp:send', ({ livestreamId, sdp, to }) => {
-      handleGuestSdpSend({ livestreamId, sdp, to }, socket, io);
-      // emit tương ứng: 'guest:sdp:reply'
+    // Room management
+    socket.on('random-chat:join-room', async (roomId) => {
+      try {
+        // Create router if it doesn't exist
+        await createRouter(roomId);
+
+        // Join socket.io room
+        socket.join(roomId);
+        logger.info(`Client ${socket.id} joined room ${roomId}`);
+
+        // Notify others in the room
+        socket.to(roomId).emit('user-joined', { userId: socket.id });
+      } catch (error) {
+        logger.error(`Failed to join room ${roomId}:`, error);
+        socket.emit('error', { message: 'Failed to join room' });
+      }
     });
 
-    socket.on('next:livestream', ({ livestreamId }) => {
-      handleNextLivestream({ livestreamId }, socket, io);
-      // emit tương ứng: 'livestream:next'
-    });
-
-    socket.on('leave:livestream', ({ livestreamId }) => {
-      handleLeaveLivestream({ livestreamId }, socket, io);
-      // emit tương ứng: 'livestream:left'
-    });
-
-    socket.on('send:message', ({ livestreamId, message, type }) => {
-      handleSendMessage({ livestreamId, message, type }, socket, io);
-      // emit tương ứng: 'message:sent'
+    socket.on('random-chat:leave-room', (roomId) => {
+      socket.leave(roomId);
+      logger.info(`Client ${socket.id} left room ${roomId}`);
+      socket.to(roomId).emit('user-left', { userId: socket.id });
     });
 
     socket.on('disconnect', async () => {
-      await decrementOnline()
-        .then(() => getOnline())
-        .then((count) => io.emit('online', count))
+      await decreVideoChatOnline()
+        .then(() => getVideoChatOnline())
+        .then((count) => io.emit('random-chat-online', count))
         .catch((error) => logger.error('Error updating online count:', error));
 
-      if (socket.data.connectionType === 'lt') {
-        await handleDisconnect(socket.id, socket, io);
-      }
-
-      if (socket.data.connectionType === 'rc') {
-        await handleRcDisconnect(socket.id, io);
+      if (socket.data.type === 'random-chat') {
+        await handleRandomChatDisconnect(socket.id, io);
       }
 
       logger.info(`Socket disconnected: ${socket.id}`);
     });
   });
+
+  return io;
 };
 
-module.exports = setupSocketIO;
+module.exports = initializeSocket;

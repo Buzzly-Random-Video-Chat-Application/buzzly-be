@@ -3,16 +3,22 @@ const { Server } = require('socket.io');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
-const setupSocketIO = require('./socket/socket');
+const initializeSocket = require('./socket/socket');
 const { redis } = require('./config/redis');
+const { createWorker } = require('./mediasoup/worker');
 
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => {
   logger.info('Connected to MongoDB');
+
   await redis.connect();
+
+  await createWorker();
+
   server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`);
   });
+
   const io = new Server(server, {
     path: '/v1/socket',
     cors: {
@@ -20,7 +26,10 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(async () => 
       methods: ['GET', 'POST'],
     },
   });
-  setupSocketIO(io);
+
+  initializeSocket(io);
+
+  logger.info('Socket.io initialized');
 });
 
 const exitHandler = () => {

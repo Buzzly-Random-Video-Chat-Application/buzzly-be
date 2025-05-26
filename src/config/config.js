@@ -30,6 +30,7 @@ const envVarsSchema = Joi.object()
     REDIS_HOST: Joi.string().description('redis host'),
     REDIS_PORT: Joi.number().description('redis port'),
     FRONTEND_URL: Joi.string().description('frontend url'),
+    MEDIASOUP_ANNOUNCED_IP: Joi.string().description('mediasoup announced IP'),
   })
   .unknown();
 
@@ -76,4 +77,5 @@ module.exports = {
     password: envVars.REDIS_PASSWORD,
   },
   frontendUrl: envVars.FRONTEND_URL,
+  mediasoupAnnouncedIp: envVars.MEDIASOUP_ANNOUNCED_IP,
 };
