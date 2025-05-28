@@ -3,7 +3,7 @@ const { Server } = require('socket.io');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
-const setupSocketIO = require('./socket/socket');
+const setupSocketIO = require('./socket/onSocketEvents');
 const { redis } = require('./config/redis');
 
 let server;
