@@ -9,7 +9,7 @@ const router = express.Router();
 router
   .route('/')
   .post(auth('create'), validate(livestreamValidation.createLivestream), livestreamController.createLivestream)
-  .get(auth('get'), validate(livestreamValidation.queryLivestreams), livestreamController.queryLivestreams);
+  .get(validate(livestreamValidation.queryLivestreams), livestreamController.queryLivestreams);
 
 router
   .route('/:livestreamId')
@@ -86,8 +86,6 @@ module.exports = router;
  *     summary: Get a list of livestreams
  *     description: Retrieve a paginated list of livestreams based on filters.
  *     tags: [Livestreams]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: isLive

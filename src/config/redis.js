@@ -25,52 +25,53 @@ redis.on('end', () => {
   logger.info('Redis connection closed');
 });
 
-const incrementOnline = async () => {
+const incrVideoChatOnline = async () => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during incrementOnline');
+    logger.error('Redis client is closed during increase video chat online count');
     return;
   }
   try {
-    await redis.incr('online');
+    await redis.incr('video-chat-online');
   } catch (error) {
-    logger.error('Failed to increment online count:', error);
+    logger.error('Failed to increase video chat online count:', error);
   }
 };
 
-const decrementOnline = async () => {
+const decrVideoChatOnline = async () => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during decrementOnline');
+    logger.error('Redis client is closed during decrease video chat online count');
     return;
   }
   try {
-    await redis.decr('online');
+    await redis.decr('video-chat-online');
   } catch (error) {
-    logger.error('Failed to decrement online count:', error);
+    logger.error('Failed to decrease video chat online count:', error);
   }
 };
 
-const getOnline = async () => {
+const getVideoChatOnline = async () => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during getOnline');
+    logger.error('Redis client is closed during get video chat online count');
     return 0;
   }
   try {
-    const count = await redis.get('online');
+    const count = await redis.get('video-chat-online');
     return count || 0;
   } catch (error) {
-    logger.error('Failed to get online count:', error);
+    logger.error('Failed to get video chat online count:', error);
     return 0;
   }
 };
 
 const addToWaitingList = async (gender, country, socketId) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during addToWaitingList');
+    logger.error(`Redis client is closed during add user with socket id: ${socketId} to video chat waiting list`);
     return;
   }
   const key = `${gender}:${country}`;
   try {
     await redis.zAdd(key, { score: Date.now(), value: socketId });
+    await redis.expire(key, 3600);
   } catch (error) {
     logger.error(`Failed to add ${socketId} to waiting list ${key}:`, error);
   }
@@ -78,7 +79,7 @@ const addToWaitingList = async (gender, country, socketId) => {
 
 const getFirstWaitingUser = async (gender, country) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during getFirstWaitingUser');
+    logger.error('Redis client is closed during get first waiting user from video chat waiting list');
     return null;
   }
   const key = `${gender}:${country}`;
@@ -93,7 +94,7 @@ const getFirstWaitingUser = async (gender, country) => {
 
 const removeFromWaitingList = async (gender, country, socketId) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during removeFromWaitingList');
+    logger.error(`Redis client is closed during remove user with socket id: ${socketId} from video chat waiting list`);
     return;
   }
   const key = `${gender}:${country}`;
@@ -104,7 +105,7 @@ const removeFromWaitingList = async (gender, country, socketId) => {
   }
 };
 
-const saveRcRoom = async (roomId, p1Id, p2Id, userIds = {}) => {
+const saveVideoChatRoom = async (roomId, p1Id, p2Id, userIds = {}) => {
   if (!redis.isOpen) {
     logger.error('Redis client is closed during saveRoom');
     throw new Error('Redis client is closed');
@@ -126,7 +127,7 @@ const saveRcRoom = async (roomId, p1Id, p2Id, userIds = {}) => {
   }
 };
 
-const getRcRoom = async (roomId) => {
+const getVideoChatRoom = async (roomId) => {
   if (!redis.isOpen) {
     logger.error('Redis client is closed during getRoom');
     return null;
@@ -140,7 +141,7 @@ const getRcRoom = async (roomId) => {
   }
 };
 
-const deleteRcRoom = async (roomId) => {
+const deleteVideoChatRoom = async (roomId) => {
   if (!redis.isOpen) {
     logger.error('Redis client is closed during deleteRoom');
     return;
@@ -152,9 +153,9 @@ const deleteRcRoom = async (roomId) => {
   }
 };
 
-const saveLtRoom = async (livestreamId, host, guests = []) => {
+const saveLivestreamRoom = async (livestreamId, host, guests = []) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during saveLtRoom');
+    logger.error('Redis client is closed during save livestream room');
     throw new Error('Redis client is closed');
   }
   if (!host.hostUserId || !host.hostSocketId) {
@@ -183,9 +184,9 @@ const saveLtRoom = async (livestreamId, host, guests = []) => {
   }
 };
 
-const getLtRoom = async (livestreamId) => {
+const getLivestreamRoom = async (livestreamId) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during getLtRoom');
+    logger.error('Redis client is closed during get livestream room');
     return null;
   }
   const guestSetKey = `livestream:${livestreamId}:guests`;
@@ -206,9 +207,9 @@ const getLtRoom = async (livestreamId) => {
   }
 };
 
-const addGuestToLtRoom = async (livestreamId, guest) => {
+const addGuestToLivestreamRoom = async (livestreamId, guest) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during addGuestToLtRoom');
+    logger.error('Redis client is closed during add guest to livestream room');
     return;
   }
   if (!guest.guestUserId || !guest.guestSocketId) {
@@ -231,9 +232,9 @@ const addGuestToLtRoom = async (livestreamId, guest) => {
   }
 };
 
-const removeGuestFromLtRoom = async (livestreamId, guestSocketId) => {
+const removeGuestFromLivestreamRoom = async (livestreamId, guestSocketId) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during removeGuestFromLtRoom');
+    logger.error('Redis client is closed during remove guest from livestream room');
     return;
   }
   const guestSetKey = `livestream:${livestreamId}:guests`;
@@ -254,9 +255,9 @@ const removeGuestFromLtRoom = async (livestreamId, guestSocketId) => {
   }
 };
 
-const deleteLtRoom = async (livestreamId) => {
+const deleteLivestreamRoom = async (livestreamId) => {
   if (!redis.isOpen) {
-    logger.error('Redis client is closed during deleteLtRoom');
+    logger.error('Redis client is closed during delete livestream room');
     return;
   }
   const guestSetKey = `livestream:${livestreamId}:guests`;
@@ -269,21 +270,78 @@ const deleteLtRoom = async (livestreamId) => {
   }
 };
 
+const getLivestreamGuestCount = async (livestreamId) => {
+  if (!redis.isOpen) {
+    logger.error('Redis client is closed during get livestream guest count');
+    return 0;
+  }
+  const guestSetKey = `livestream:${livestreamId}:guests`;
+  try {
+    const count = await redis.sCard(guestSetKey); 
+    return count;
+  } catch (error) {
+    logger.error(`Failed to get livestream guest count ${livestreamId}:`, error);
+    return 0;
+  }
+};
+
+const incrLivestreamOnline = async () => {
+  if (!redis.isOpen) {
+    logger.error('Redis client is closed during increase livestream online count');
+    return;
+  }
+  try {
+    await redis.incr('livestream-online');
+  } catch (error) {
+    logger.error('Failed to increase livestream online count:', error);
+  }
+};
+
+const decrLivestreamOnline = async () => {
+  if (!redis.isOpen) {
+    logger.error('Redis client is closed during decrease livestream online count');
+    return;
+  }
+  try {
+    await redis.decr('livestream-online');
+  } catch (error) {
+    logger.error('Failed to decrease livestream online count:', error);
+  }
+};
+
+const getLivestreamOnline = async () => {
+  if (!redis.isOpen) {
+    logger.error('Redis client is closed during get livestream online count');
+    return 0;
+  }
+  try {
+    const count = await redis.get('livestream-online');
+    return count || 0;
+  } catch (error) {
+    logger.error('Failed to get livestream online count:', error);
+    return 0;
+  }
+};
+
 module.exports = {
   redis,
-  incrementOnline,
-  decrementOnline,
-  getOnline,
+  incrVideoChatOnline,
+  decrVideoChatOnline,
+  getVideoChatOnline,
   addToWaitingList,
   getFirstWaitingUser,
   removeFromWaitingList,
-  saveRcRoom,
-  getRcRoom,
-  deleteRcRoom,
+  saveVideoChatRoom,
+  getVideoChatRoom,
+  deleteVideoChatRoom,
 
-  saveLtRoom,
-  getLtRoom,
-  addGuestToLtRoom,
-  removeGuestFromLtRoom,
-  deleteLtRoom,
+  saveLivestreamRoom,
+  getLivestreamRoom,
+  addGuestToLivestreamRoom,
+  removeGuestFromLivestreamRoom,
+  deleteLivestreamRoom,
+  getLivestreamGuestCount,
+  incrLivestreamOnline,
+  decrLivestreamOnline,
+  getLivestreamOnline,
 };
