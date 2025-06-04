@@ -1,4 +1,4 @@
-const { User, Connection, Review } = require('../models');
+const { User, Connection, Review, Livestream } = require('../models');
 
 /**
  * Get user statistics with percentage change compared to last week
@@ -157,9 +157,41 @@ const getReviewStatistics = async () => {
   };
 };
 
+/**
+ * Get livestream statistics
+ * @returns {Promise<Object>}
+ */
+const getLivestreamStatistics = async () => {
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const totalLivestreams = await Livestream.countDocuments();
+  const liveLivestreams = await Livestream.countDocuments({ isLive: true });
+
+  const totalLivestreamsPrevious = await Livestream.countDocuments({ createdAt: { $lte: oneWeekAgo } });
+  const liveLivestreamsPrevious = await Livestream.countDocuments({ isLive: true, createdAt: { $lte: oneWeekAgo } });
+
+  const calculatePercentageChange = (current, previous) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  return {
+    total: {
+      quantity: totalLivestreams,
+      percentage: calculatePercentageChange(totalLivestreams, totalLivestreamsPrevious).toFixed(2),
+    },
+    live: {
+      quantity: liveLivestreams,
+      percentage: calculatePercentageChange(liveLivestreams, liveLivestreamsPrevious).toFixed(2),
+    },
+  };
+};
+
 module.exports = {
   getUserStatistics,
   getConnectionStatistics,
   getWeeklyConnectionStatistics,
   getReviewStatistics,
+  getLivestreamStatistics,
 };

@@ -167,21 +167,6 @@ module.exports = router;
  *     tags: [Blogs]
  *     parameters:
  *       - in: query
- *         name: label
- *         schema:
- *           type: string
- *         description: Filter by blog label
- *       - in: query
- *         name: title
- *         schema:
- *           type: string
- *         description: Filter by blog title
- *       - in: query
- *         name: author
- *         schema:
- *           type: string
- *         description: Filter by author ID
- *       - in: query
  *         name: isPinned
  *         schema:
  *           type: boolean
@@ -190,12 +175,12 @@ module.exports = router;
  *         name: sortBy
  *         schema:
  *           type: string
- *         description: Sort by field (e.g., createdAt:desc)
+ *         description: Sort by field (e.g., name:asc)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Number of blogs per page
+ *         description: Number of users per page
  *       - in: query
  *         name: page
  *         schema:

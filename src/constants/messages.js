@@ -67,11 +67,13 @@ const MESSAGES = {
     GET_CONNECTION_STATISTICS_SUCCESS: 'Connection statistics retrieved successfully',
     GET_WEEKLY_CONNECTION_STATISTICS_SUCCESS: 'Weekly connection statistics retrieved successfully',
     GET_REVIEW_STATISTICS_SUCCESS: 'Review statistics retrieved successfully',
+    GET_LIVESTREAM_STATISTICS_SUCCESS: 'Live stream statistics retrieved successfully',
 
     GET_USER_STATISTICS_FAILED: 'Failed to retrieve user statistics',
     GET_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve connection statistics',
     GET_WEEKLY_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve weekly connection statistics',
     GET_REVIEW_STATISTICS_FAILED: 'Failed to retrieve review statistics',
+    GET_LIVESTREAM_STATISTICS_FAILED: 'Failed to retrieve live stream statistics',
   },
   LIVESTREAM: {
     CREATE_SUCCESS: 'Live stream created successfully',
@@ -86,6 +88,19 @@ const MESSAGES = {
     UPDATE_FAILED: 'Failed to update live stream',
     DELETE_FAILED: 'Failed to delete live stream',
     GET_ACTIVE_STREAMS_FAILED: 'Failed to retrieve active live streams',
+  },
+  CONNECTION: {
+    CREATE_SUCCESS: 'Connection created successfully',
+    GET_CONNECTIONS_SUCCESS: 'Connections retrieved successfully',
+    GET_CONNECTION_SUCCESS: 'Connection retrieved successfully',
+    UPDATE_SUCCESS: 'Connection updated successfully',
+    DELETE_SUCCESS: 'Connection deleted successfully',
+
+    CREATE_FAILED: 'Failed to create connection',
+    GET_CONNECTIONS_FAILED: 'Failed to retrieve connections',
+    GET_CONNECTION_FAILED: 'Failed to retrieve connection',
+    UPDATE_FAILED: 'Failed to update connection',
+    DELETE_FAILED: 'Failed to delete connection',
   },
 };
 

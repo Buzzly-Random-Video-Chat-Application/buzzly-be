@@ -17,11 +17,10 @@ const createLivestream = {
 
 const queryLivestreams = {
   query: Joi.object().keys({
-    isLive: Joi.boolean().optional(),
-
-    sortBy: Joi.string().optional(),
-    limit: Joi.number().integer().optional(),
-    page: Joi.number().integer().optional(),
+    isLive: Joi.boolean(),
+    sortBy: Joi.string(),
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
   }),
 };
 

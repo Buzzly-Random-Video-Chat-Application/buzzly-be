@@ -21,9 +21,7 @@ const createLivestream = async (livestreamBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryLivestreams = async (filter, options) => {
-  const sortBy = options.sortBy || 'createdAt:desc';
-  const updatedOptions = { ...options, sortBy };
-  const livestreams = await Livestream.paginate(filter, updatedOptions);
+  const livestreams = await Livestream.paginate(filter, options);
   return livestreams;
 };
 

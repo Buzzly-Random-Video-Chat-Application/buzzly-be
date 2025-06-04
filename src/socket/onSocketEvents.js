@@ -78,7 +78,8 @@ const setupSocketIO = (io) => {
       handleHostSdpSend({ livestreamId, sdp, to }, socket, io);
     });
 
-    socket.on('end:livestream', ({ livestreamId }) => {
+    socket.on('livestream:end', ({ livestreamId }) => {
+      logger.info(`Ending livestream ${livestreamId} by host ${socket.handshake.query.userId}`);
       handleEndLivestream({ livestreamId }, socket, io);
     });
 
@@ -103,7 +104,7 @@ const setupSocketIO = (io) => {
     });
 
     socket.on('livestream:send-message', ({ livestreamId, message, type }) => {
-      handleLivestreamSendMessage({ livestreamId, message, type }, socket);
+      handleLivestreamSendMessage({ livestreamId, message, type }, socket, io);
     });
 
     socket.on('video-chat:disconnect', async () => {

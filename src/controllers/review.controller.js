@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { reviewService } = require('../services');
 const MESSAGES = require('../constants/messages');
+const pick = require('../utils/pick');
 
 const createReview = catchAsync(async (req, res) => {
   const result = await reviewService.createReview(req.body);
@@ -12,12 +13,8 @@ const createReview = catchAsync(async (req, res) => {
 });
 
 const queryReviews = catchAsync(async (req, res) => {
-  const filter = req.query;
-  const options = {
-    sortBy: req.query.sortBy,
-    limit: req.query.limit,
-    page: req.query.page,
-  };
+  const filter = pick(req.query, ['rating']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const { results, page, limit, totalPages, totalResults } = await reviewService.queryReviews(filter, options);
   res.send({
     message: MESSAGES.REVIEW.GET_REVIEWS_SUCCESS,

@@ -24,10 +24,7 @@ const createBlog = async (blogBody) => {
  * @returns {Promise<QueryResult>}
  */
 const getBlogs = async (filter, options) => {
-  const defaultSort = options.sortBy || 'createdAt:desc';
-  const updatedOptions = { ...options, sortBy: defaultSort, populate: 'author' };
-  // const finalFilter = { ...filter, deleteAt: null }; // Exclude soft-deleted blogs
-  const blogs = await Blog.paginate(filter, updatedOptions);
+  const blogs = await Blog.paginate(filter, options);
   return blogs;
 };
 

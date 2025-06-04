@@ -15,7 +15,15 @@ const password = (value, helpers) => {
   return value;
 };
 
+const uuid = (value, helpers) => {
+  if (!value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+    return helpers.message('"{{#label}}" must be a valid uuid');
+  }
+  return value;
+};
+
 module.exports = {
   objectId,
   password,
+  uuid,
 };

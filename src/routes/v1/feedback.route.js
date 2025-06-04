@@ -91,15 +91,19 @@ module.exports = router;
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
+ *         name: isProcessed
+ *         schema:
+ *           type: boolean
+ *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
- *         description: Sort by field (e.g., createdAt:desc)
+ *         description: Sort by field (e.g., name:asc)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Maximum number of feedbacks per page
+ *         description: Number of users per page
  *       - in: query
  *         name: page
  *         schema:

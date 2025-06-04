@@ -11,6 +11,7 @@ const createFeedback = {
 };
 const queryFeedbacks = {
   query: Joi.object().keys({
+    isProcessed: Joi.boolean(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),

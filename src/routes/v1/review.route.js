@@ -104,27 +104,27 @@ module.exports = router;
  *     tags: [Reviews]
  *     parameters:
  *       - in: query
- *         name: userId
+ *         name: rating
  *         schema:
- *           type: string
- *         description: Filter reviews by user ID
+ *           type: number
+ *           minimum: 0
+ *           maximum: 5
+ *         description: Filter reviews by rating
  *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
- *         description: Sort by field (e.g., rating:asc, createdAt:desc)
+ *         description: Sort by field (e.g., name:asc)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           minimum: 1
- *         description: Maximum number of reviews per page (default = 10)
+ *         description: Number of users per page
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *           minimum: 1
- *         description: Current page number (default = 1)
+ *         description: Current page number
  *     responses:
  *       "200":
  *         description: A list of reviews

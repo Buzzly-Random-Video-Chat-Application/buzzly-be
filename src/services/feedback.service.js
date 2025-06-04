@@ -21,9 +21,7 @@ const createFeedback = async (feedbackBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryFeedbacks = async (filter, options) => {
-  const sortBy = options.sortBy || 'createdAt:desc';
-  const updatedOptions = { ...options, sortBy };
-  const feedbacks = await Feedback.paginate(filter, updatedOptions);
+  const feedbacks = await Feedback.paginate(filter, options);
   return feedbacks;
 };
 

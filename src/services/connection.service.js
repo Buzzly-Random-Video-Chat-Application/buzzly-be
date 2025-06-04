@@ -21,9 +21,7 @@ const createConnection = async (connectionBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryConnections = async (filter, options) => {
-  const sortBy = options.sortBy || 'createdAt:desc';
-  const updatedOptions = { ...options, sortBy };
-  const connections = await Connection.paginate(filter, updatedOptions);
+  const connections = await Connection.paginate(filter, options);
   return connections;
 };
 
