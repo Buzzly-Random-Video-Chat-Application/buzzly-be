@@ -117,6 +117,11 @@ router
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [user, admin]
+ *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string

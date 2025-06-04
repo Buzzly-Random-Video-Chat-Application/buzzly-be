@@ -13,6 +13,7 @@ const {
   addGuestToLivestreamRoom,
   removeGuestFromLivestreamRoom,
   deleteLivestreamRoom,
+  getLivestreamGuestCount,
   redis,
 } = require('../config/redis');
 const logger = require('../config/logger');
@@ -52,7 +53,7 @@ async function handleVideoChatStart(selectedGender, selectedCountry, socket, cb,
     let existingRoomId = null;
     for (const roomKey of rooms) {
       const room = await getVideoChatRoom(roomKey.split(':')[1]);
-      if (room && room.p1 === waitingSocketId && room.isAvailable === 'true') {
+      if (room && room.p1 == waitingSocketId && room.isAvailable == 'true') {
         existingRoomId = roomKey.split(':')[1];
         break;
       }
@@ -158,7 +159,7 @@ async function handleVideoChatDisconnect(disconnectedId, io) {
     const room = await getVideoChatRoom(roomKey.split(':')[1]);
     if (!room) continue;
 
-    if (room.p1 === disconnectedId) {
+    if (room.p1 == disconnectedId) {
       if (room.p2) {
         const p2Socket = io.sockets.sockets.get(room.p2);
         if (p2Socket && p2Socket.connected) {
@@ -173,7 +174,7 @@ async function handleVideoChatDisconnect(disconnectedId, io) {
         await deleteVideoChatRoom(roomKey.split(':')[1]);
       }
       break;
-    } else if (room.p2 === disconnectedId) {
+    } else if (room.p2 == disconnectedId) {
       const p1Socket = io.sockets.sockets.get(room.p1);
       if (p1Socket && p1Socket.connected) {
         io.to(room.p1).emit('video-chat:disconnected');
@@ -198,8 +199,8 @@ async function getVideoChatType(id) {
   for (const roomKey of rooms) {
     const room = await getVideoChatRoom(roomKey.split(':')[1]);
     if (!room) continue;
-    if (room.p1 === id) return { type: 'p1', p2id: room.p2 };
-    if (room.p2 === id) return { type: 'p2', p1id: room.p1 };
+    if (room.p1 == id) return { type: 'p1', p2id: room.p2 };
+    if (room.p2 == id) return { type: 'p2', p1id: room.p1 };
   }
   return null;
 }
@@ -212,7 +213,7 @@ async function getVideoChatType(id) {
  */
 async function handleVideoChatIceSend({ candidate, to }, socket, io) {
   const type = await getVideoChatType(socket.id);
-  if (type && ((type.type === 'p1' && type.p2id === to) || (type.type === 'p2' && type.p1id === to))) {
+  if (type && ((type.type == 'p1' && type.p2id == to) || (type.type == 'p2' && type.p1id == to))) {
     const toSocket = io.sockets.sockets.get(to);
     if (toSocket && toSocket.connected) {
       io.to(to).emit('video-chat:ice:reply', { candidate, from: socket.id });
@@ -235,7 +236,7 @@ async function handleVideoChatIceSend({ candidate, to }, socket, io) {
  */
 async function handleVideoChatSdpSend({ sdp, to }, socket, io) {
   const type = await getVideoChatType(socket.id);
-  if (type && ((type.type === 'p1' && type.p2id === to) || (type.type === 'p2' && type.p1id === to))) {
+  if (type && ((type.type == 'p1' && type.p2id == to) || (type.type == 'p2' && type.p1id == to))) {
     const toSocket = io.sockets.sockets.get(to);
     if (toSocket && toSocket.connected) {
       io.to(to).emit('video-chat:sdp:reply', { sdp, from: socket.id });
@@ -458,6 +459,7 @@ async function handleJoinLivestream({ livestreamId }, socket, cb, io) {
     const guestSocketId = socket.id;
 
     const hostSocketId = roomData.hostSocketId;
+    const hostUserId = roomData.hostUserId;
 
     socket.join(livestreamId);
     socket.data.type = 'livestream';
@@ -481,6 +483,7 @@ async function handleJoinLivestream({ livestreamId }, socket, cb, io) {
       success: true,
       message: 'Joined livestream successfully',
       hostSocketId,
+      hostUserId,
     });
   } catch (error) {
     socket.emit('livestream:error', `Failed to join livestream: ${error.message}`);
@@ -494,7 +497,7 @@ async function handleJoinLivestream({ livestreamId }, socket, cb, io) {
  * @param {Object} { livestreamId, message, type } - The ID of the livestream, the message, and the type of the message.
  * @param {Socket} socket - The socket object of the user.
  */
-async function handleLivestreamSendMessage({ livestreamId, message, type }, socket) {
+async function handleLivestreamSendMessage({ livestreamId, message, type }, socket, io) {
   if (!redis.isOpen) {
     socket.emit('livestream:error', 'Redis unavailable');
     logger.error('Redis client is closed');
@@ -518,8 +521,8 @@ async function handleLivestreamSendMessage({ livestreamId, message, type }, sock
       return;
     }
 
-    const isHost = roomData.hostUserId === senderId && roomData.hostSocketId === senderSocketId;
-    const isGuest = roomData.guests.some((g) => g.guestUserId === senderId && g.guestSocketId === senderSocketId);
+    const isHost = roomData.hostUserId == senderId && roomData.hostSocketId == senderSocketId;
+    const isGuest = roomData.guests.some((g) => g.guestUserId == senderId && g.guestSocketId == senderSocketId);
 
     if (!isHost && !isGuest) {
       socket.emit('livestream:error', 'Unauthorized: Not a host or guest to send message');
@@ -533,7 +536,7 @@ async function handleLivestreamSendMessage({ livestreamId, message, type }, sock
       return;
     }
 
-    socket.to(livestreamId).emit('livestream:get-message', { message, type, senderId });
+    io.to(livestreamId).emit('livestream:get-message', { message, type, senderId });
     logger.info(`Message sent in livestream ${livestreamId} by ${senderId} (${type})`);
   } catch (error) {
     socket.emit('livestream:error', `Failed to send message: ${error.message}`);
@@ -619,7 +622,7 @@ async function handleGuestIceSend({ livestreamId, candidate, to }, socket, io) {
       return;
     }
 
-    const isGuest = roomData.guests.some((g) => g.guestUserId === senderId && g.guestSocketId === senderSocketId);
+    const isGuest = roomData.guests.some((g) => g.guestUserId == senderId && g.guestSocketId == senderSocketId);
     if (!isGuest) {
       socket.emit('livestream:error', 'Unauthorized: Not a guest');
       logger.error(`Unauthorized ICE from ${senderId} in livestream ${livestreamId}`);
@@ -723,7 +726,7 @@ async function handleGuestSdpSend({ livestreamId, sdp, to }, socket, io) {
       return;
     }
 
-    const isGuest = roomData.guests.some((g) => g.guestUserId === senderId && g.guestSocketId === senderSocketId);
+    const isGuest = roomData.guests.some((g) => g.guestUserId == senderId && g.guestSocketId == senderSocketId);
     if (!isGuest) {
       socket.emit('livestream:error', 'Unauthorized: Not a guest');
       logger.error(`Unauthorized SDP from ${senderId} in livestream ${livestreamId}`);
@@ -778,8 +781,9 @@ async function handleEndLivestream({ livestreamId }, socket, io) {
     }
 
     await livestreamService.updateLivestream(livestreamId, { isLive: false });
-    io.to(livestreamId).emit('livestream:ended');
     await deleteLivestreamRoom(livestreamId);
+
+    io.to(livestreamId).emit('livestream:ended');
     logger.info(`Livestream ${livestreamId} ended by host ${senderId}`);
   } catch (error) {
     socket.emit('livestream:error', `Failed to end livestream: ${error.message}`);
@@ -814,12 +818,12 @@ async function handleNextLivestream({ livestreamId }, socket, io) {
     // Rời livestream hiện tại
     socket.leave(livestreamId);
     await removeGuestFromLivestreamRoom(livestreamId, senderSocketId);
-    io.to(livestreamId).emit('livestream:left', { guestUserId: senderId, guestSocketId: senderSocketId });
+    io.to(livestreamId).emit('livestream:left', { guestSocketId: senderSocketId });
     logger.info(`Guest ${senderSocketId} left livestream ${livestreamId} for switching`);
 
     // Tìm livestream mới
     const activeLivestreams = await livestreamService.getActiveLivestreams({ excludeId: livestreamId });
-    if (!activeLivestreams || activeLivestreams.length === 0) {
+    if (!activeLivestreams || activeLivestreams.length == 0) {
       socket.emit('livestream:error', 'No other active livestreams available');
       logger.info(`No other active livestreams available for guest ${senderSocketId}`);
       socket.data.type = null;
@@ -887,10 +891,14 @@ async function handleLeaveLivestream({ livestreamId }, socket, io) {
     socket.data.livestreamId = null;
 
     if (senderId && socket.data.isAuthenticated) {
-      const isGuest = roomData.guests.some((g) => g.guestUserId === senderId && g.guestSocketId === senderSocketId);
+      const isGuest = roomData.guests.some((g) => g.guestUserId == senderId && g.guestSocketId == senderSocketId);
       if (isGuest) {
         await removeGuestFromLivestreamRoom(livestreamId, senderSocketId);
-        io.to(livestreamId).emit('livestream:left', { guestUserId: senderId, guestSocketId: senderSocketId });
+        const guestCount = await getLivestreamGuestCount(livestreamId);
+        io.in(livestreamId).emit('livestream:guest-count', guestCount);
+        io.in(livestreamId).emit('livestream:left', { guestSocketId: senderSocketId });
+        socket.emit('livestream:left', { guestSocketId: senderSocketId });
+
         logger.info(`Authenticated guest ${senderSocketId} left livestream ${livestreamId}`);
       } else {
         logger.info(`Authenticated user ${senderSocketId} left livestream ${livestreamId} (not in guest list)`);
@@ -919,17 +927,16 @@ async function handleLivestreamDisconnect(disconnectedSocketId, socket, io) {
   const roomData = await getLivestreamRoom(livestreamId);
   if (!roomData) return;
 
-  if (roomData.hostUserId === socket.handshake.query.userId) {
+  if (roomData.hostUserId == socket.handshake.query.userId) {
     await livestreamService.updateLivestream(livestreamId, { isLive: false });
     io.to(livestreamId).emit('livestream:ended');
     await deleteLivestreamRoom(livestreamId);
     logger.info(`Livestream ${livestreamId} ended due to host ${disconnectedSocketId} disconnect`);
   } else if (socket.data.isAuthenticated) {
-    const isGuest = roomData.guests.some((g) => g.guestSocketId === disconnectedSocketId);
+    const isGuest = roomData.guests.some((g) => g.guestSocketId == disconnectedSocketId);
     if (isGuest) {
       await removeGuestFromLivestreamRoom(livestreamId, disconnectedSocketId);
       io.to(livestreamId).emit('livestream:left', {
-        guestUserId: socket.handshake.query.userId,
         guestSocketId: disconnectedSocketId,
       });
       logger.info(`Authenticated guest ${disconnectedSocketId} left livestream ${livestreamId} due to disconnect`);

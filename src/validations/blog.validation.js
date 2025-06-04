@@ -33,9 +33,6 @@ const createBlog = {
 
 const getBlogs = {
   query: Joi.object().keys({
-    label: Joi.string().trim(),
-    title: Joi.string().trim(),
-    author: Joi.string().custom(objectId),
     isPinned: Joi.boolean(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),

@@ -3,6 +3,7 @@ const catchAsync = require('../utils/catchAsync');
 const { feedbackService, emailService } = require('../services');
 const MESSAGES = require('../constants/messages');
 const config = require('../config/config');
+const pick = require('../utils/pick');
 
 const createFeedback = catchAsync(async (req, res) => {
   const result = await feedbackService.createFeedback(req.body);
@@ -16,12 +17,8 @@ const createFeedback = catchAsync(async (req, res) => {
 });
 
 const queryFeedbacks = catchAsync(async (req, res) => {
-  const filter = req.query;
-  const options = {
-    sortBy: req.query.sortBy,
-    limit: req.query.limit,
-    page: req.query.page,
-  };
+  const filter = pick(req.query, ['isProcessed']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const { results, page, limit, totalPages, totalResults } = await feedbackService.queryFeedbacks(filter, options);
   res.send({
     message: MESSAGES.FEEDBACK.GET_FEEDBACKS_SUCCESS,

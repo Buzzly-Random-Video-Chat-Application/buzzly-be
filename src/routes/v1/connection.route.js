@@ -1,38 +1,38 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const { livestreamValidation } = require('../../validations');
-const { livestreamController } = require('../../controllers');
+const { connectionValidation } = require('../../validations');
+const { connectionController } = require('../../controllers');
 
 const router = express.Router();
 
 router
   .route('/')
-  .post(auth('create'), validate(livestreamValidation.createLivestream), livestreamController.createLivestream)
-  .get(validate(livestreamValidation.queryLivestreams), livestreamController.queryLivestreams);
+  .post(auth('create'), validate(connectionValidation.createConnection), connectionController.createConnection)
+  .get(auth('get'), validate(connectionValidation.queryConnections), connectionController.queryConnections);
 
 router
-  .route('/:livestreamId')
-  .get(auth('get'), validate(livestreamValidation.getLivestream), livestreamController.getLivestream)
-  .patch(auth('update'), validate(livestreamValidation.updateLivestream), livestreamController.updateLivestream)
-  .delete(auth('delete'), validate(livestreamValidation.deleteLivestream), livestreamController.deleteLivestream);
+  .route('/:roomId')
+  .get(auth('get'), validate(connectionValidation.getConnection), connectionController.getConnection)
+  .patch(auth('update'), validate(connectionValidation.updateConnection), connectionController.updateConnection)
+  .delete(auth('delete'), validate(connectionValidation.deleteConnection), connectionController.deleteConnection);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Livestreams
- *   description: APIs for managing livestream rooms
+ *   name: Connections
+ *   description: APIs for managing connections
  */
 
 /**
  * @swagger
- * /livestreams:
+ * /connections:
  *   post:
- *     summary: Create a new livestream
- *     description: Create a livestream room. Only authenticated users can create a livestream. The livestreamId is automatically generated.
- *     tags: [Livestreams]
+ *     summary: Create a new connection
+ *     description: Create a connection between two users. Only authenticated users can create a connection. The connectionId is automatically generated.
+ *     tags: [Connections]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -42,32 +42,19 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - livestreamName
- *               - host
+ *               - roomId
+ *               - p1UserId
+ *               - p2UserId
  *             properties:
- *               livestreamName:
+ *               roomId:
  *                 type: string
- *               livestreamGreeting:
+ *               p1UserId:
  *                 type: string
- *               livestreamAnnouncement:
+ *               p2UserId:
  *                 type: string
- *               host:
- *                 type: object
- *                 properties:
- *                   userId:
- *                     type: string
- *                   socketId:
- *                     type: string
- *             example:
- *               livestreamName: "My Live Show"
- *               livestreamGreeting: "Welcome to my stream!"
- *               livestreamAnnouncement: "We'll start at 8 PM"
- *               host:
- *                 userId: "507f1f77bcf86cd799439011"
- *                 socketId: "abc123"
  *     responses:
- *       "201":
- *         description: Created
+ *       201:
+ *         description: Connection created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -76,16 +63,23 @@ module.exports = router;
  *                 message:
  *                   type: string
  *                 result:
- *                   $ref: '#/components/schemas/Livestream'
+ *                   $ref: '#/components/schemas/Connection'
  *       "400":
  *         $ref: '#/components/responses/BadRequest'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
- *
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
  *   get:
- *     summary: Get a list of livestreams
- *     description: Retrieve a paginated list of livestreams based on filters.
- *     tags: [Livestreams]
+ *     summary: Get a list of connections
+ *     description: Retrieve a paginated list of connections based on filters.
+ *     tags: [Connections]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: isLive
@@ -108,7 +102,7 @@ module.exports = router;
  *         description: Current page number
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Connections retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -119,37 +113,41 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Livestream'
+ *                     $ref: '#/components/schemas/Connection'
  *                 page:
- *                   type: integer
+ *                   type: number
  *                 limit:
- *                   type: integer
- *                 totalPages:
- *                   type: integer
- *                 totalResults:
- *                   type: integer
+ *                   type: number
  *       "400":
  *         $ref: '#/components/responses/BadRequest'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
- *
- * /livestreams/{livestreamId}:
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+
+/**
+ * @swagger
+ * /connections/{roomId}:
  *   get:
- *     summary: Get a livestream by ID
- *     description: Retrieve details of a specific livestream by its ID.
- *     tags: [Livestreams]
+ *     summary: Get a connection by ID
+ *     description: Retrieve a connection by its unique identifier.
+ *     tags: [Connections]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: livestreamId
+ *         name: roomId
  *         required: true
  *         schema:
  *           type: string
- *           format: objectId
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Connection retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -158,27 +156,27 @@ module.exports = router;
  *                 message:
  *                   type: string
  *                 result:
- *                   $ref: '#/components/schemas/Livestream'
+ *                   $ref: '#/components/schemas/Connection'
  *       "400":
  *         $ref: '#/components/responses/BadRequest'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
  *       "404":
  *         $ref: '#/components/responses/NotFound'
- *
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
  *   patch:
- *     summary: Update a livestream
- *     description: Update a livestream's details. Only the host can update.
- *     tags: [Livestreams]
+ *     summary: Update a connection by ID
+ *     description: Update a connection by its unique identifier.
+ *     tags: [Connections]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: livestreamId
+ *         name: roomId
  *         required: true
- *         schema:
- *           type: string
- *           format: objectId
  *     requestBody:
  *       required: true
  *       content:
@@ -186,21 +184,17 @@ module.exports = router;
  *           schema:
  *             type: object
  *             properties:
- *               livestreamName:
+ *               roomId:
  *                 type: string
- *               livestreamGreeting:
+ *               p1UserId:
  *                 type: string
- *               livestreamAnnouncement:
+ *               p2UserId:
  *                 type: string
  *               isLive:
  *                 type: boolean
- *             example:
- *               livestreamName: "Updated Live Show"
- *               livestreamGreeting: "New greeting!"
- *               isLive: false
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Connection updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -209,7 +203,7 @@ module.exports = router;
  *                 message:
  *                   type: string
  *                 result:
- *                   $ref: '#/components/schemas/Livestream'
+ *                   $ref: '#/components/schemas/Connection'
  *       "400":
  *         $ref: '#/components/responses/BadRequest'
  *       "401":
@@ -218,23 +212,21 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
  *         $ref: '#/components/responses/NotFound'
- *
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
  *   delete:
- *     summary: Delete a livestream
- *     description: Delete a livestream. Only the host can delete.
- *     tags: [Livestreams]
+ *     summary: Delete a connection by ID
+ *     description: Delete a connection by its unique identifier.
+ *     tags: [Connections]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: livestreamId
+ *         name: roomId
  *         required: true
- *         schema:
- *           type: string
- *           format: objectId
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Connection deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -250,31 +242,23 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
  *         $ref: '#/components/responses/NotFound'
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
 /**
  * @swagger
  * components:
  *   schemas:
- *     Livestream:
+ *     Connection:
  *       type: object
  *       properties:
- *         livestreamId:
+ *         roomId:
  *           type: string
- *           format: objectId
- *         livestreamName:
+ *         p1UserId:
  *           type: string
- *         livestreamGreeting:
+ *         p2UserId:
  *           type: string
- *         livestreamAnnouncement:
- *           type: string
- *         host:
- *           type: object
- *           properties:
- *             userId:
- *               type: string
- *             socketId:
- *               type: string
  *         isLive:
  *           type: boolean
  *         createdAt:

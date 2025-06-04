@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { livestreamService } = require('../services');
 const MESSAGES = require('../constants/messages');
+const pick = require('../utils/pick');
 
 const createLivestream = catchAsync(async (req, res) => {
   const result = await livestreamService.createLivestream(req.body);
@@ -12,12 +13,8 @@ const createLivestream = catchAsync(async (req, res) => {
 });
 
 const queryLivestreams = catchAsync(async (req, res) => {
-  const filter = req.query;
-  const options = {
-    sortBy: req.query.sortBy,
-    limit: req.query.limit,
-    page: req.query.page,
-  };
+  const filter = pick(req.query, ['isLive']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const { results, page, limit, totalPages, totalResults } = await livestreamService.queryLivestreams(filter, options);
   res.send({
     message: MESSAGES.LIVESTREAM.GET_STREAMS_SUCCESS,
