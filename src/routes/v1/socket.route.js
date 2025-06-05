@@ -13,7 +13,7 @@ module.exports = router;
  * @swagger
  * tags:
  *   name: Socket
- *   description:
+ *   description: Socket.IO service
  */
 
 /**

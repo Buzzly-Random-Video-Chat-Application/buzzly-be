@@ -8,7 +8,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Statistics
- *   description: User and connection statistics management
+ *   description: Statistics management
  */
 
 /**
@@ -294,5 +294,65 @@ router.route('/reviews').get(auth('manage'), statisticController.getReviewStatis
  *         $ref: '#/components/responses/Forbidden'
  */
 router.route('/livestreams').get(auth('manage'), statisticController.getLivestreamStatistics);
+
+/**
+ * @swagger
+ * /statistics/feedbacks:
+ *   get:
+ *     summary: Get feedback statistics
+ *     description: Retrieve statistics about total and resolved feedbacks, including percentage change compared to the previous week. Requires authentication and manage permission.
+ *     tags: [Statistics]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Feedback statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Feedback statistics retrieved successfully
+ *                 results:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: object
+ *                       properties:
+ *                         quantity:
+ *                           type: integer
+ *                         percentage:
+ *                           type: number
+ *                           format: float
+ *                           description: Percentage change compared to the previous week
+ *                           example: 10.0
+ *                     resolved:
+ *                       type: object
+ *                       properties:
+ *                         quantity:
+ *                           type: integer
+ *                         percentage:
+ *                           type: number
+ *                           format: float
+ *                           description: Percentage change compared to the previous week
+ *                           example: 10.0
+ *                     processing:
+ *                       type: object
+ *                       properties:
+ *                         quantity:
+ *                           type: integer
+ *                         percentage:
+ *                           type: number
+ *                           format: float
+ *                           description: Percentage change compared to the previous week
+ *                           example: 10.0
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.route('/feedbacks').get(auth('manage'), statisticController.getFeedbackStatistics);
 
 module.exports = router;

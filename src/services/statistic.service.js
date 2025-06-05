@@ -1,4 +1,4 @@
-const { User, Connection, Review, Livestream } = require('../models');
+const { User, Connection, Review, Livestream, Feedback } = require('../models');
 
 /**
  * Get user statistics with percentage change compared to last week
@@ -188,10 +188,48 @@ const getLivestreamStatistics = async () => {
   };
 };
 
+/**
+ * Get feedback statistics
+ * @returns {Promise<Object>}
+ */
+const getFeedbackStatistics = async () => {
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const totalFeedbacks = await Feedback.countDocuments();
+  const processedFeedbacks = await Feedback.countDocuments({ isProcessed: true });
+  const unresolvedFeedbacks = await Feedback.countDocuments({ isProcessed: false });
+
+  const totalFeedbacksPrevious = await Feedback.countDocuments({ createdAt: { $lte: oneWeekAgo } });
+  const processedFeedbacksPrevious = await Feedback.countDocuments({ isProcessed: true, createdAt: { $lte: oneWeekAgo } });
+  const unresolvedFeedbacksPrevious = await Feedback.countDocuments({ isProcessed: false, createdAt: { $lte: oneWeekAgo } });
+
+  const calculatePercentageChange = (current, previous) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  return {
+    total: {
+      quantity: totalFeedbacks,
+      percentage: calculatePercentageChange(totalFeedbacks, totalFeedbacksPrevious).toFixed(2),
+    },
+    processing: {
+      quantity: unresolvedFeedbacks,
+      percentage: calculatePercentageChange(unresolvedFeedbacks, unresolvedFeedbacksPrevious).toFixed(2),
+    },
+    resolved: {
+      quantity: processedFeedbacks,
+      percentage: calculatePercentageChange(processedFeedbacks, processedFeedbacksPrevious).toFixed(2),
+    },
+  };
+};
+
 module.exports = {
   getUserStatistics,
   getConnectionStatistics,
   getWeeklyConnectionStatistics,
   getReviewStatistics,
   getLivestreamStatistics,
+  getFeedbackStatistics,
 };

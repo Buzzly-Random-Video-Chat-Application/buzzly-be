@@ -68,12 +68,14 @@ const MESSAGES = {
     GET_WEEKLY_CONNECTION_STATISTICS_SUCCESS: 'Weekly connection statistics retrieved successfully',
     GET_REVIEW_STATISTICS_SUCCESS: 'Review statistics retrieved successfully',
     GET_LIVESTREAM_STATISTICS_SUCCESS: 'Live stream statistics retrieved successfully',
+    GET_FEEDBACK_STATISTICS_SUCCESS: 'Feedback statistics retrieved successfully',
 
     GET_USER_STATISTICS_FAILED: 'Failed to retrieve user statistics',
     GET_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve connection statistics',
     GET_WEEKLY_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve weekly connection statistics',
     GET_REVIEW_STATISTICS_FAILED: 'Failed to retrieve review statistics',
     GET_LIVESTREAM_STATISTICS_FAILED: 'Failed to retrieve live stream statistics',
+    GET_FEEDBACK_STATISTICS_FAILED: 'Failed to retrieve feedback statistics',
   },
   LIVESTREAM: {
     CREATE_SUCCESS: 'Live stream created successfully',
