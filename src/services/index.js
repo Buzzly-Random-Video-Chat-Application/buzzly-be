@@ -8,3 +8,4 @@ module.exports.feedbackService = require('./feedback.service');
 module.exports.statisticService = require('./statistic.service');
 module.exports.connectionService = require('./connection.service');
 module.exports.livestreamService = require('./livestream.service');
+module.exports.importService = require('./import.service');

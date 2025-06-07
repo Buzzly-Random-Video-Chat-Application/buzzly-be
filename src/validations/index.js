@@ -7,3 +7,4 @@ module.exports.feedbackValidation = require('./feedback.validation');
 module.exports.statisticValidation = require('./statistic.validation');
 module.exports.livestreamValidation = require('./livestream.validation');
 module.exports.connectionValidation = require('./connection.validation');
+module.exports.importValidation = require('./import.validation');

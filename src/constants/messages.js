@@ -46,6 +46,7 @@ const MESSAGES = {
     UPDATE_SUCCESS: 'Blog updated successfully',
     DELETE_SUCCESS: 'Blog deleted successfully',
     PIN_SUCCESS: 'Blog pinned successfully',
+    IMPORT_SUCCESS: 'Blogs imported successfully',
   },
   REVIEW: {
     CREATE_SUCCESS: 'Review created successfully',
@@ -68,12 +69,14 @@ const MESSAGES = {
     GET_WEEKLY_CONNECTION_STATISTICS_SUCCESS: 'Weekly connection statistics retrieved successfully',
     GET_REVIEW_STATISTICS_SUCCESS: 'Review statistics retrieved successfully',
     GET_LIVESTREAM_STATISTICS_SUCCESS: 'Live stream statistics retrieved successfully',
+    GET_FEEDBACK_STATISTICS_SUCCESS: 'Feedback statistics retrieved successfully',
 
     GET_USER_STATISTICS_FAILED: 'Failed to retrieve user statistics',
     GET_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve connection statistics',
     GET_WEEKLY_CONNECTION_STATISTICS_FAILED: 'Failed to retrieve weekly connection statistics',
     GET_REVIEW_STATISTICS_FAILED: 'Failed to retrieve review statistics',
     GET_LIVESTREAM_STATISTICS_FAILED: 'Failed to retrieve live stream statistics',
+    GET_FEEDBACK_STATISTICS_FAILED: 'Failed to retrieve feedback statistics',
   },
   LIVESTREAM: {
     CREATE_SUCCESS: 'Live stream created successfully',
@@ -101,6 +104,12 @@ const MESSAGES = {
     GET_CONNECTION_FAILED: 'Failed to retrieve connection',
     UPDATE_FAILED: 'Failed to update connection',
     DELETE_FAILED: 'Failed to delete connection',
+  },
+  IMPORT: {
+    CREATE_SUCCESS: 'Import created successfully',
+    GET_IMPORTS_SUCCESS: 'Imports retrieved successfully',
+    GET_IMPORT_SUCCESS: 'Import retrieved successfully',
+    DELETE_SUCCESS: 'Import deleted successfully',
   },
 };
 

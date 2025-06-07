@@ -83,10 +83,27 @@ const getLivestreamStatistics = catchAsync(async (req, res) => {
   });
 });
 
+const getFeedbackStatistics = catchAsync(async (req, res) => {
+  const results = await statisticService.getFeedbackStatistics();
+
+  if (!results) {
+    res.status(httpStatus.NOT_FOUND).send({
+      message: MESSAGES.STATISTIC.GET_FEEDBACK_STATISTICS_FAILED,
+    });
+    throw new ApiError(httpStatus.NOT_FOUND, MESSAGES.STATISTIC.GET_FEEDBACK_STATISTICS_FAILED);
+  }
+
+  res.status(httpStatus.OK).send({
+    message: MESSAGES.STATISTIC.GET_FEEDBACK_STATISTICS_SUCCESS,
+    results,
+  });
+});
+
 module.exports = {
   getUserStatistics,
   getConnectionStatistics,
   getWeeklyConnectionStatistics,
   getReviewStatistics,
   getLivestreamStatistics,
+  getFeedbackStatistics,
 };

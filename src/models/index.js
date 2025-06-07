@@ -5,3 +5,4 @@ module.exports.Blog = require('./blog.model');
 module.exports.Feedback = require('./feedback.model');
 module.exports.Connection = require('./connection.model');
 module.exports.Livestream = require('./livestream.model');
+module.exports.Import = require('./import.model');

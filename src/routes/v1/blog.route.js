@@ -32,6 +32,15 @@ router
 
 router.route('/:blogId/pin').put(auth('manage'), validate(blogValidation.pinBlog), blogController.pinBlog);
 
+
+router.post(
+  '/import',
+  auth('manage'),
+  upload.single('file'),
+  validate(blogValidation.importBlogs),
+  blogController.importBlogs
+);
+
 module.exports = router;
 
 /**
@@ -427,6 +436,93 @@ module.exports = router;
  *                 message:
  *                   type: string
  *                   example: Blog not found
+ */
+
+/**
+ * @swagger
+ * /blogs/import:
+ *   post:
+ *     summary: Import blogs from a file
+ *     description: Import blogs from a file.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: File to import
+ *     responses:
+ *       "200":
+ *         description: Blogs imported successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Blogs imported successfully
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       success:
+ *                         type: boolean
+ *                       error:
+ *                         type: string
+ *                       blog:
+ *                         $ref: '#/components/schemas/Blog'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "400":
+ *         description: Invalid file format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Invalid file format
+ *       "404":
+ *         description: File not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: File not found
+ *       "500":
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
  */
 
 /**

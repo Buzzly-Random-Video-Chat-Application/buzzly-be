@@ -123,6 +123,26 @@ blogSchema.statics.isTitleTaken = async function (title, excludeBlogId) {
 };
 
 /**
+ * Pin new blog and unpin old pinned blogs
+ * @param {ObjectId} blogId - The id of the blog to be pinned
+ * @returns {Promise<Blog>}
+ */
+blogSchema.statics.changePinnedBlog = async function (blogId) {
+  const blog = await this.findById(blogId);
+  if (!blog) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Blog not found');
+  }
+  const oldPinnedBlog = await this.findOne({ isPinned: true });
+  if (oldPinnedBlog) {
+    oldPinnedBlog.isPinned = false;
+    await oldPinnedBlog.save();
+  }
+  blog.isPinned = true;
+  await blog.save();
+  return blog;
+};
+
+/**
  * @typedef Blog
  */
 const Blog = mongoose.model('Blog', blogSchema);
