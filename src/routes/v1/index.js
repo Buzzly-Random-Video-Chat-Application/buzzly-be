@@ -10,6 +10,7 @@ const feedbackRoute = require('./feedback.route');
 const statisticRoute = require('./statistic.route');
 const livestreamRoute = require('./livestream.route');
 const connectionRoute = require('./connection.route');
+const importRoute = require('./import.route');
 
 const config = require('../../config/config');
 
@@ -25,6 +26,7 @@ const defaultRoutes = [
   { path: '/statistics', route: statisticRoute },
   { path: '/livestreams', route: livestreamRoute },
   { path: '/connections', route: connectionRoute },
+  { path: '/imports', route: importRoute },
 ];
 
 const devRoutes = [{ path: '/docs', route: docsRoute }];

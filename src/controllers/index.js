@@ -6,3 +6,4 @@ module.exports.feedbackController = require('./feedback.controller');
 module.exports.statisticController = require('./statistic.controller');
 module.exports.livestreamController = require('./livestream.controller');
 module.exports.connectionController = require('./connection.controller');
+module.exports.importController = require('./import.controller');

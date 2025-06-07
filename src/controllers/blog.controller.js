@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/ApiError');
-const { blogService } = require('../services');
+const { blogService, importService } = require('../services');
 const cloudinary = require('../config/cloudinary');
 const MESSAGES = require('../constants/messages');
 
@@ -71,6 +71,31 @@ const pinBlog = catchAsync(async (req, res) => {
   });
 });
 
+const importBlogs = catchAsync(async (req, res) => {
+  const file = req.file;
+  if (!file) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No file uploaded');
+  }
+
+  const results = await blogService.importBlogs(file, req.user._id);
+
+  const hasSuccessfulImport = results.some(result => result.success);
+  if (hasSuccessfulImport) {
+    const fileUrl = await cloudinary.uploadFile(file);
+    await importService.createImport({
+      fileName: file.originalname,
+      fileUrl: fileUrl.secure_url,
+      entryDate: new Date(),
+      author: req.user._id,
+    });
+  }
+
+  res.status(httpStatus.OK).json({
+    message: MESSAGES.BLOG.IMPORT_SUCCESS,
+    results,
+  });
+});
+
 module.exports = {
   createBlog,
   getBlogs,
@@ -78,4 +103,5 @@ module.exports = {
   updateBlog,
   deleteBlog,
   pinBlog,
+  importBlogs,
 };

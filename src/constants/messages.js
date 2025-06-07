@@ -46,6 +46,7 @@ const MESSAGES = {
     UPDATE_SUCCESS: 'Blog updated successfully',
     DELETE_SUCCESS: 'Blog deleted successfully',
     PIN_SUCCESS: 'Blog pinned successfully',
+    IMPORT_SUCCESS: 'Blogs imported successfully',
   },
   REVIEW: {
     CREATE_SUCCESS: 'Review created successfully',
@@ -103,6 +104,12 @@ const MESSAGES = {
     GET_CONNECTION_FAILED: 'Failed to retrieve connection',
     UPDATE_FAILED: 'Failed to update connection',
     DELETE_FAILED: 'Failed to delete connection',
+  },
+  IMPORT: {
+    CREATE_SUCCESS: 'Import created successfully',
+    GET_IMPORTS_SUCCESS: 'Imports retrieved successfully',
+    GET_IMPORT_SUCCESS: 'Import retrieved successfully',
+    DELETE_SUCCESS: 'Import deleted successfully',
   },
 };
 

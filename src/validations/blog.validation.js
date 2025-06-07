@@ -20,7 +20,7 @@ const createBlog = {
     image_title: Joi.string().required().trim(),
     content: Joi.alternatives()
       .try(Joi.array().items(blogContentSchema).max(10).min(1), blogContentSchema)
-      .custom((value, helpers) => {
+      .custom((value) => {
         if (!Array.isArray(value)) {
           return [value];
         }
@@ -74,6 +74,10 @@ const pinBlog = {
   }),
 };
 
+const importBlogs = {
+  body: Joi.object().keys({}),
+};
+
 module.exports = {
   createBlog,
   getBlogs,
@@ -81,4 +85,5 @@ module.exports = {
   updateBlog,
   deleteBlog,
   pinBlog,
+  importBlogs,
 };
